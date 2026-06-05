@@ -102,18 +102,6 @@ export default function Login({ status, canResetPassword }) {
                             >
                                 Sign in
                             </button>
-
-                            <div className="text-center text-sm text-gray-600 font-medium">
-                                or
-                            </div>
-
-                            {/* サインアップボタン (ダミー) */}
-                            <button
-                                type="button"
-                                className="w-full bg-white border border-gray-300 text-gray-800 rounded-full py-3.5 text-base font-medium flex items-center justify-center hover:bg-gray-50 transition-colors"
-                            >
-                                Sign up
-                            </button>
                         </div>
                     </form>
                 </div>
