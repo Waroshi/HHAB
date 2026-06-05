@@ -1,9 +1,6 @@
-import Checkbox from '@/Components/Checkbox';
+import AuthPhoneShell from '@/Components/AuthPhoneShell';
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
@@ -15,86 +12,120 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('login'), {
             onFinish: () => reset('password'),
         });
     };
 
     return (
-        <GuestLayout>
+        // 全体の背景色（下部の明るい緑）
+        <div className="relative min-h-screen bg-[#50C868] overflow-hidden flex flex-col font-sans">
             <Head title="Log in" />
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+            {/* 上部の濃い緑の背景（clip-pathを使って斜めにカット） */}
+            <div 
+                className="absolute top-0 left-0 right-0 bg-[#113A28] z-0"
+                style={{ height: '65%', clipPath: 'polygon(0 0, 100% 0, 100% 80%, 0 100%)' }}
+            ></div>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
+            {/* コンテンツエリア */}
+            <div className="relative z-10 flex-1 flex flex-col justify-center px-6 py-12 sm:px-12 max-w-md mx-auto w-full">
+                
+                {/* ヘッダーテキスト */}
+                <div className="mb-8">
+                    <h1 className="text-white text-4xl font-bold tracking-wide">Welcome</h1>
+                    <p className="text-white text-sm mt-2 opacity-90">Login to access your account</p>
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
-                            name="remember"
-                            checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
-                        />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
+                {/* 白いカードパネル */}
+                <div className="bg-white rounded-[2rem] p-8 shadow-2xl w-full">
+                    {status && (
+                        <div className="mb-4 text-sm font-medium text-green-600">
+                            {status}
+                        </div>
                     )}
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
+                    <form onSubmit={submit} className="space-y-6">
+                        {/* Email入力欄 */}
+                        <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-800">
+                                Email address
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                autoComplete="username"
+                                className="mt-1 block w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-[#113A28] bg-transparent transition-colors text-black text-base placeholder-gray-400"
+                                required
+                            />
+                            <InputError message={errors.email} className="mt-2" />
+                        </div>
+
+                        {/* Password入力欄とForgotリンク */}
+                        <div>
+                            <div className="flex justify-between items-center">
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-800">
+                                    Password
+                                </label>
+                                {canResetPassword && (
+                                    <Link
+                                        href={route('password.request')}
+                                        className="text-xs font-medium text-[#50C868] hover:text-[#3da351] transition-colors"
+                                    >
+                                        Forgot?
+                                    </Link>
+                                )}
+                            </div>
+                            <input
+                                id="password"
+                                type="password"
+                                name="password"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                autoComplete="current-password"
+                                className="mt-1 block w-full border-0 border-b border-gray-300 px-0 py-2 focus:ring-0 focus:border-[#113A28] bg-transparent transition-colors text-black text-base"
+                                required
+                            />
+                            <InputError message={errors.password} className="mt-2" />
+                        </div>
+
+                        {/* ボタンエリア */}
+                        <div className="pt-6 space-y-4">
+                            {/* サインインボタン */}
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="w-full bg-[#113A28] text-white rounded-full py-3.5 text-base font-medium hover:bg-[#0c291c] transition-colors shadow-md disabled:opacity-60"
+                            >
+                                Sign in
+                            </button>
+
+                            <div className="text-center text-sm text-gray-600 font-medium">
+                                or
+                            </div>
+
+                            {/* サインアップボタン (ダミー) */}
+                            <button
+                                type="button"
+                                className="w-full bg-white border border-gray-300 text-gray-800 rounded-full py-3.5 text-base font-medium flex items-center justify-center hover:bg-gray-50 transition-colors"
+                            >
+                                Sign up
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </GuestLayout>
+
+                {/* フッターリンク */}
+                <div className="mt-10 text-center text-sm text-[#113A28]">
+                    Don't have an account?{' '}
+                    <Link href={route('register')} className="font-bold hover:underline">
+                        Sign Up
+                    </Link>
+                </div>
+            </div>
+        </div>
     );
 }

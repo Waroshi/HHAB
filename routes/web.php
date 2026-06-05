@@ -1,5 +1,10 @@
 <?php
 
+// routes/web.php
+// Defines browser routes that render Inertia pages.
+// Exists to connect Laravel routes to React page components.
+// RELATED FILES: routes/auth.php, resources/js/Pages/Dashboard.jsx, resources/js/Pages/Welcome.jsx
+
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +21,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

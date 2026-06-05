@@ -1,26 +1,32 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+// resources/js/Pages/Dashboard.jsx
+// Renders the development dashboard page.
+// Exists as the app's main screen while features are built.
+// RELATED FILES: routes/web.php, resources/js/Layouts/AuthenticatedLayout.jsx, resources/js/app.jsx
+
 import { Head } from '@inertiajs/react';
 
 export default function Dashboard() {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
+        <main className="min-h-screen bg-[#f6f7f2]">
             <Head title="Dashboard" />
 
-            <div className="py-12">
+            <section className="border-b border-[#dfe5d2] bg-white">
+                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+                    <h1 className="text-xl font-semibold text-[#233023]">
+                        Dashboard
+                    </h1>
+                </div>
+            </section>
+
+            <section className="py-10">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            You're logged in!
-                        </div>
+                    <div className="bg-white p-6 shadow-sm sm:rounded-lg">
+                        <p className="text-gray-900">
+                            uououououououououououououououououououououououououououo
+                        </p>
                     </div>
                 </div>
-            </div>
-        </AuthenticatedLayout>
+            </section>
+        </main>
     );
 }
