@@ -1,3 +1,8 @@
+// resources/js/Pages/Auth/Login.jsx
+// Shows the login form for existing users.
+// Exists so users can sign in and navigate to password reset or registration.
+// RELATED FILES: resources/js/Pages/Auth/Register.jsx, resources/js/Pages/Auth/ForgotPassword.jsx, resources/js/Components/InputError.jsx
+
 import AuthPhoneShell from '@/Components/AuthPhoneShell';
 import InputError from '@/Components/InputError';
 import TextInput from '@/Components/TextInput';
@@ -25,7 +30,7 @@ export default function Login({ status, canResetPassword }) {
             {/* 上部の濃い緑の背景（clip-pathを使って斜めにカット） */}
             <div 
                 className="absolute top-0 left-0 right-0 bg-[#113A28] z-0"
-                style={{ height: '65%', clipPath: 'polygon(0 0, 100% 0, 100% 80%, 0 100%)' }}
+                style={{ height: '55%', clipPath: 'polygon(0 0, 100% 0, 100% 75%, 0 100%)' }}
             ></div>
 
             {/* コンテンツエリア */}
