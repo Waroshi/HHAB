@@ -1,8 +1,3 @@
-// resources/js/Pages/Auth/ResetPassword.jsx
-// Shows the password reset form reached from an emailed reset link.
-// Exists so users can set a new password after requesting a reset.
-// RELATED FILES: resources/js/Pages/Auth/ForgotPassword.jsx, resources/js/Pages/Auth/Login.jsx, resources/js/Components/InputError.jsx
-
 import InputError from '@/Components/InputError';
 import { Head, Link, useForm } from '@inertiajs/react';
 
