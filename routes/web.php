@@ -6,6 +6,7 @@
 // RELATED FILES: resources/js/Pages/Dashboard.jsx, resources/js/Layouts/AuthenticatedLayout.jsx, routes/auth.php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomeController; 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
