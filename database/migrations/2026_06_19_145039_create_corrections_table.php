@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('corrections', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('receipt_id');
-            $table->string('store_name')->nullable();
-            $table->string('ai_category_id')->nullable();
-            $table->string('user_category_id')->nullable();
+            $table->foreignId('receipt_id')->constrained()->onDelete('cascade');
+            $table->string('store_name');
+            $table->foreignId('ai_category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('user_category_id')->constrained('categories')->onDelete('cascade');
             $table->timestamps();
         });
     }

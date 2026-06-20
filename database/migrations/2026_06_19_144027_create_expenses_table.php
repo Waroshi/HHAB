@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('spent_at');
-            $table->string('category_id');
-            $table->string('receipt_id')->nullable();
-            $table->string('amount');
+            $table->date('spent_at');
+            $table->string('store_name')->nullable();
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('receipt_id')->nullable()->constrained()->onDelete('cascade');
+            $table->integer('amount')->unsigned();
             $table->string('memo')->nullable();
-            
             $table->timestamps();
         });
     }
