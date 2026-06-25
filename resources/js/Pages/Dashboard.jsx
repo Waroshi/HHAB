@@ -3,11 +3,12 @@
 // Exists as the app's main screen while features are built.
 // RELATED FILES: routes/web.php, resources/js/Layouts/AuthenticatedLayout.jsx, resources/js/app.jsx
 
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
 export default function Dashboard() {
     return (
-        <main className="min-h-screen bg-[#f6f7f2]">
+        <AuthenticatedLayout>
             <Head title="Dashboard" />
 
             <section className="border-b border-[#dfe5d2] bg-white">
@@ -27,6 +28,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             </section>
-        </main>
+        </AuthenticatedLayout>
     );
 }

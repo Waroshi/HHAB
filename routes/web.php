@@ -1,11 +1,12 @@
 <?php
 
 // routes/web.php
-// Defines browser routes that render Inertia pages.
-// Exists to connect Laravel routes to React page components.
-// RELATED FILES: routes/auth.php, resources/js/Pages/Dashboard.jsx, resources/js/Pages/Welcome.jsx
+// Defines the browser routes for the Inertia web app.
+// Exists to connect URLs to Laravel controllers and React pages.
+// RELATED FILES: resources/js/Pages/Dashboard.jsx, resources/js/Layouts/AuthenticatedLayout.jsx, routes/auth.php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HomeController; 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
