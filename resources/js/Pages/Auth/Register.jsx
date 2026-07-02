@@ -19,31 +19,24 @@ export default function Register() {
     };
 
     return (
-        // 全体の背景色（下部の明るい緑）
         <div className="relative min-h-screen bg-[#50C868] overflow-hidden flex flex-col font-sans">
             <Head title="Register" />
 
-            {/* 上部の濃い緑の背景（clip-pathを使って斜めにカット） */}
-            {/* ※入力項目が多くカードが縦長になるため、Login画面より背景の割合を少し調整しています */}
             <div 
                 className="absolute top-0 left-0 right-0 bg-[#113A28] z-0"
                 style={{ height: '55%', clipPath: 'polygon(0 0, 100% 0, 100% 75%, 0 100%)' }}
             ></div>
 
-            {/* コンテンツエリア */}
             <div className="relative z-10 flex-1 flex flex-col justify-center px-6 py-10 sm:px-12 max-w-md mx-auto w-full">
                 
-                {/* ヘッダーテキスト */}
                 <div className="mb-6">
                     <h1 className="text-white text-4xl font-bold tracking-wide">Register</h1>
                     <p className="text-white text-sm mt-2 opacity-90">Create a new account</p>
                 </div>
-
-                {/* 白いカードパネル */}
+                
                 <div className="bg-white rounded-[2rem] p-8 shadow-2xl w-full">
                     <form onSubmit={submit} className="space-y-6">
                         
-                        {/* Name入力欄 */}
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-800">
                                 Name
@@ -60,8 +53,7 @@ export default function Register() {
                             />
                             <InputError message={errors.name} className="mt-2" />
                         </div>
-
-                        {/* Email入力欄 */}
+                        
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-800">
                                 Email address
@@ -78,8 +70,7 @@ export default function Register() {
                             />
                             <InputError message={errors.email} className="mt-2" />
                         </div>
-
-                        {/* Password入力欄 */}
+                        
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-800">
                                 Password
@@ -96,8 +87,7 @@ export default function Register() {
                             />
                             <InputError message={errors.password} className="mt-2" />
                         </div>
-
-                        {/* Confirm Password入力欄 */}
+                        
                         <div>
                             <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-800">
                                 Confirm password
@@ -115,7 +105,6 @@ export default function Register() {
                             <InputError message={errors.password_confirmation} className="mt-2" />
                         </div>
 
-                        {/* サインアップボタン */}
                         <div className="pt-4">
                             <button
                                 type="submit"
@@ -128,7 +117,6 @@ export default function Register() {
                     </form>
                 </div>
 
-                {/* フッターリンク */}
                 <div className="mt-8 text-center text-sm text-white font-medium">
                     Already have account?{' '}
                     <Link href={route('login')} className="font-bold text-[#113A28] hover:underline">
