@@ -1,9 +1,5 @@
 <?php
 
-// routes/web.php
-// Defines the browser routes for the Inertia web app.
-// Exists to connect URLs to Laravel controllers and React pages.
-// RELATED FILES: resources/js/Pages/Dashboard.jsx, resources/js/Layouts/AuthenticatedLayout.jsx, routes/auth.php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;

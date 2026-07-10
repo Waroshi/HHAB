@@ -1,7 +1,3 @@
-// resources/js/Pages/Transaction.jsx
-// Shows the mobile transaction list screen.
-// Exists so users can search and filter income and expense transactions.
-// RELATED FILES: app/Http/Controllers/TransactionController.php, resources/js/Components/BottomNavbar.jsx, routes/web.php
 
 import BottomNavbar from '@/Components/BottomNavbar';
 import { Head, router } from '@inertiajs/react';

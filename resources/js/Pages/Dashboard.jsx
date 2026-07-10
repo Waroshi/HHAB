@@ -1,7 +1,3 @@
-// resources/js/Pages/Dashboard.jsx
-// Renders the development dashboard page.
-// Exists as the app's main screen while features are built.
-// RELATED FILES: routes/web.php, resources/js/Layouts/AuthenticatedLayout.jsx, resources/js/app.jsx
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';

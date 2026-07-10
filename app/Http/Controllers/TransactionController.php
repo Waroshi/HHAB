@@ -1,10 +1,5 @@
 <?php
 
-// app/Http/Controllers/TransactionController.php
-// Shows the transaction list page.
-// Exists to pass filtered expense and income data to the Inertia transaction page.
-// RELATED FILES: resources/js/Pages/Transaction.jsx, routes/web.php, app/Models/Expense.php, app/Models/Income.php
-
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
