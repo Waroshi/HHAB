@@ -59,7 +59,7 @@ export default function Scan() {
 
             <header className="relative flex items-center justify-center px-5 pt-5 pb-3">
                 <Link
-                    href="/home"
+                    href="/dashboard"
                     aria-label="戻る"
                     className="absolute left-4 p-2 rounded-full bg-white/10 active:bg-white/20"
                 >

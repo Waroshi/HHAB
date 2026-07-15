@@ -28,6 +28,10 @@ Route::get('/dashboard', function () {
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/scan', function () {
+        return Inertia::render('Scan');
+    })->name('readings.index');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
