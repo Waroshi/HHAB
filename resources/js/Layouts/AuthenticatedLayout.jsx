@@ -13,6 +13,14 @@ import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth?.user;
+    const trimmedUserName =
+        typeof user?.name === 'string' ? user.name.trim() : '';
+    const userName = trimmedUserName || 'ユーザー';
+    const userEmail =
+        typeof user?.email === 'string' && user.email.trim()
+            ? user.email.trim()
+            : 'メール未設定';
+    const userInitial = trimmedUserName.charAt(0).toUpperCase() || 'U';
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -151,12 +159,20 @@ export default function AuthenticatedLayout({ header, children }) {
 
                     {user && (
                         <div className="border-t border-gray-200 pb-1 pt-4">
-                            <div className="px-4">
-                                <div className="text-base font-medium text-gray-800">
-                                    {user.name}
+                            <div className="mx-4 flex min-w-0 items-center gap-3 rounded-xl bg-gray-50 px-4 py-3 dark:bg-neutral-800">
+                                <div
+                                    aria-hidden="true"
+                                    className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-600 dark:bg-brand-800/40 dark:text-brand-300"
+                                >
+                                    {userInitial}
                                 </div>
-                                <div className="text-sm font-medium text-gray-500">
-                                    {user.email}
+                                <div className="min-w-0 flex-1">
+                                    <div className="truncate text-base font-semibold text-gray-800 dark:text-neutral-100">
+                                        {userName}
+                                    </div>
+                                    <div className="truncate text-sm text-gray-500 dark:text-neutral-400">
+                                        {userEmail}
+                                    </div>
                                 </div>
                             </div>
 
