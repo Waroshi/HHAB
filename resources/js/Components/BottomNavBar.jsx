@@ -17,10 +17,14 @@ export default function BottomNavBar() {
     const visibleNavItems = navItems.filter((item) =>
         route().has(item.routeName),
     );
+    const gridColumnClassName =
+        visibleNavItems.length === 5 ? 'grid-cols-5' : 'grid-cols-4';
 
     return (
         <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white">
-            <div className="mx-auto grid max-w-md grid-cols-4">
+            <div
+                className={`mx-auto grid max-w-md ${gridColumnClassName}`}
+            >
                 {visibleNavItems.map((item) => {
                     const isActive = route().current(item.active);
 
@@ -29,7 +33,7 @@ export default function BottomNavBar() {
                             key={item.label}
                             href={route(item.routeName)}
                             className={[
-                                'flex flex-col items-center justify-center px-2 py-3 text-xs font-medium',
+                                'flex min-w-0 flex-col items-center justify-center whitespace-nowrap px-1 py-3 text-[10px] font-medium sm:text-xs',
                                 isActive
                                     ? 'text-[#113A28]'
                                     : 'text-gray-500 hover:text-[#113A28]',
