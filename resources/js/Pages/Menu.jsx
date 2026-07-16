@@ -9,6 +9,7 @@ import {
     UserIcon,
 } from '@/Components/Icons';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { THEME_OPTIONS, useTheme } from '@/theme';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 function MenuRow({ icon: Icon, label, description, href, disabled = false }) {
@@ -62,6 +63,7 @@ function MenuRow({ icon: Icon, label, description, href, disabled = false }) {
 
 export default function Menu() {
     const user = usePage().props.auth?.user;
+    const { theme, setTheme } = useTheme();
     const userName =
         typeof user?.name === 'string' && user.name.trim()
             ? user.name
@@ -76,7 +78,7 @@ export default function Menu() {
         <AuthenticatedLayout>
             <Head title="メニュー" />
 
-            <div className="mx-auto max-w-md px-5 py-6 text-neutral-900 dark:text-neutral-100">
+            <div className="mx-auto min-h-screen max-w-md bg-white px-5 py-6 text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
                 <header>
                     <h1 className="text-2xl font-bold">メニュー</h1>
                     <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
@@ -118,7 +120,45 @@ export default function Menu() {
                     <Card className="divide-y divide-neutral-100 overflow-hidden dark:divide-neutral-800">
                         <MenuRow icon={TagIcon} label="カテゴリ設定" disabled />
                         <MenuRow icon={BellIcon} label="通知設定" disabled />
-                        <MenuRow icon={PaletteIcon} label="テーマ設定" disabled />
+                        <div className="px-4 py-3.5">
+                            <div className="flex items-center gap-3">
+                                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-300">
+                                    <PaletteIcon size={18} />
+                                </span>
+                                <span className="text-sm font-bold">
+                                    テーマ設定
+                                </span>
+                            </div>
+
+                            <div
+                                role="group"
+                                aria-label="テーマ設定"
+                                className="mt-3 grid grid-cols-3 gap-2"
+                            >
+                                {THEME_OPTIONS.map((option) => {
+                                    const isSelected = theme === option.value;
+
+                                    return (
+                                        <button
+                                            key={option.value}
+                                            type="button"
+                                            aria-pressed={isSelected}
+                                            onClick={() =>
+                                                setTheme(option.value)
+                                            }
+                                            className={[
+                                                'rounded-xl border px-2 py-2.5 text-xs font-bold transition focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 dark:focus:ring-offset-neutral-900',
+                                                isSelected
+                                                    ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-800/40 dark:text-brand-300'
+                                                    : 'border-neutral-200 bg-white text-neutral-500 hover:border-brand-300 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-brand-600 dark:hover:text-brand-300',
+                                            ].join(' ')}
+                                        >
+                                            {option.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </Card>
                 </section>
 
