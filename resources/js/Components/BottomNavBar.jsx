@@ -14,10 +14,14 @@ const navItems = [
 ];
 
 export default function BottomNavBar() {
+    const visibleNavItems = navItems.filter((item) =>
+        route().has(item.routeName),
+    );
+
     return (
         <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white">
             <div className="mx-auto grid max-w-md grid-cols-4">
-                {navItems.map((item) => {
+                {visibleNavItems.map((item) => {
                     const isActive = route().current(item.active);
 
                     return (
