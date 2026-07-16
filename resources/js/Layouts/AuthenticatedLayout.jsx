@@ -34,7 +34,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
                                 >
-                                    Dashboard
+                                    ホーム
                                 </NavLink>
                             </div>
                         </div>
@@ -71,19 +71,19 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <Dropdown.Link
                                                 href={route('menu.index')}
                                             >
-                                                Menu
+                                                メニュー
                                             </Dropdown.Link>
                                             <Dropdown.Link
                                                 href={route('profile.edit')}
                                             >
-                                                Profile
+                                                プロフィール
                                             </Dropdown.Link>
                                             <Dropdown.Link
                                                 href={route('logout')}
                                                 method="post"
                                                 as="button"
                                             >
-                                                Log Out
+                                                ログアウト
                                             </Dropdown.Link>
                                         </Dropdown.Content>
                                     </Dropdown>
@@ -145,7 +145,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('dashboard')}
                             active={route().current('dashboard')}
                         >
-                            Dashboard
+                            ホーム
                         </ResponsiveNavLink>
                     </div>
 
@@ -165,17 +165,17 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('menu.index')}
                                     active={route().current('menu.index')}
                                 >
-                                    Menu
+                                    メニュー
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink href={route('profile.edit')}>
-                                    Profile
+                                    プロフィール
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
                                     method="post"
                                     href={route('logout')}
                                     as="button"
                                 >
-                                    Log Out
+                                    ログアウト
                                 </ResponsiveNavLink>
                             </div>
                         </div>
