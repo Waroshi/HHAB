@@ -21,13 +21,13 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
-
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+
     Route::get('/scan', function () {
         return Inertia::render('Scan');
     })->name('readings.index');
