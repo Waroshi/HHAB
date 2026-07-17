@@ -177,7 +177,7 @@ export default function Dashboard({ summary = demoSummary }) {
                                         {Number(
                                             displaySummary.dailyBudget,
                                         ).toLocaleString('ja-JP')}
-                                        <span className="text-xs font-medium text-neutral-500">
+                                        <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                                             {' '}
                                             /日
                                         </span>
