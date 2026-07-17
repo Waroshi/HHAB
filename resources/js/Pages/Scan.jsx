@@ -2,7 +2,7 @@
 // 貼り付け先: resources/js/Pages/Scan.jsx（新規作成）
 // 役割: レシート撮影画面。
 //       <input type="file" capture="environment"> でスマホの背面カメラを起動し、
-//       撮影した画像を POST /scan で Laravel に送って読み取り結果画面へ進む。
+//       撮影した画像をプレビューし、読み取り結果画面へ進む。
 // ============================================================
 import { useRef, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
@@ -22,10 +22,10 @@ const PLACEHOLDER_LINE_WIDTHS = [84, 66, 90, 48, 72];
 export default function Scan() {
     const fileInputRef = useRef(null);
     const [previewImageUrl, setPreviewImageUrl] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
+    const [isReading, setIsReading] = useState(false);
 
     // ファイル選択（＝カメラ撮影）が完了したときの処理。
-    // プレビューを表示しつつ、すぐにサーバーへアップロードする。
+    // プレビューを表示しつつ、読み取り結果画面へ進む。
     const handleReceiptSelected = (changeEvent) => {
         const selectedFile = changeEvent.target.files?.[0];
         if (!selectedFile) {
@@ -33,12 +33,10 @@ export default function Scan() {
         }
 
         setPreviewImageUrl(URL.createObjectURL(selectedFile));
-        setIsUploading(true);
+        setIsReading(true);
 
-        // 画像ファイルを送るため forceFormData で multipart/form-data にする
-        router.post('/scan', { receipt: selectedFile }, {
-            forceFormData: true,
-            onFinish: () => setIsUploading(false),
+        router.visit(route('readings.result'), {
+            onFinish: () => setIsReading(false),
         });
     };
 
@@ -48,7 +46,7 @@ export default function Scan() {
     };
 
     let guideMessage = 'レシートを枠内に合わせてください';
-    if (isUploading) {
+    if (isReading) {
         guideMessage = '読み取り中…';
     }
 
@@ -115,7 +113,7 @@ export default function Scan() {
                 />
                 <button
                     aria-label="撮影する"
-                    disabled={isUploading}
+                    disabled={isReading}
                     onClick={openCamera}
                     className="size-[72px] rounded-full border-4 border-white/90 p-1.5
                                transition active:scale-95 disabled:opacity-40"

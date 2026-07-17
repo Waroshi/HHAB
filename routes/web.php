@@ -32,6 +32,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Scan');
     })->name('readings.index');
 
+    Route::get('/scan/result', function () {
+        return Inertia::render('ReadingResult');
+    })->name('readings.result');
+
     Route::get('/calendar', function () {
         return Inertia::render('Calendar');
     })->name('calendar.index');
