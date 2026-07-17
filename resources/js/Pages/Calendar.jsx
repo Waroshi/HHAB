@@ -17,21 +17,21 @@ const demoDailySpending = {
 };
 
 const WEEKDAY_HEADERS = [
-    { label: '日', colorClassName: 'text-red-400' },
+    { label: '日', colorClassName: 'text-red-400 dark:text-red-300' },
     { label: '月', colorClassName: '' },
     { label: '火', colorClassName: '' },
     { label: '水', colorClassName: '' },
     { label: '木', colorClassName: '' },
     { label: '金', colorClassName: '' },
-    { label: '土', colorClassName: 'text-blue-400' },
+    { label: '土', colorClassName: 'text-blue-400 dark:text-blue-300' },
 ];
 
 // ヒートマップ凡例に使う濃淡クラス（薄い→濃い）
 const HEATMAP_LEVEL_CLASSNAMES = [
-    'bg-brand-500/5',
-    'bg-brand-500/10',
-    'bg-brand-500/20',
-    'bg-brand-500/30',
+    'bg-brand-500/5 dark:!bg-brand-500/10',
+    'bg-brand-500/10 dark:!bg-brand-500/20',
+    'bg-brand-500/20 dark:!bg-brand-500/30',
+    'bg-brand-500/30 dark:!bg-brand-500/40',
 ];
 
 // 支出額の大きさに応じてセルの背景の濃さを決める。
@@ -103,9 +103,9 @@ export default function Calendar({
         <AuthenticatedLayout>
             <Head title="カレンダー" />
 
-            <div className="mx-auto max-w-md px-5 pb-8 pt-4">
+            <div className="mx-auto max-w-md px-5 pb-8 pt-4 dark:text-neutral-100">
                 <header className="pb-3">
-                    <h1 className="text-xl font-extrabold tracking-tight">カレンダー</h1>
+                    <h1 className="text-xl font-extrabold tracking-tight dark:text-neutral-50">カレンダー</h1>
                     <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
                         {year}年{month}月
                     </p>
@@ -114,8 +114,8 @@ export default function Calendar({
                 {/* ---------- 今月の支出サマリー ---------- */}
                 <Card as="section" className="p-4 flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400">今月の支出</p>
-                        <p className="tabular-nums text-2xl font-extrabold mt-0.5">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-300">今月の支出</p>
+                        <p className="tabular-nums text-2xl font-extrabold mt-0.5 dark:text-neutral-50">
                             ¥{monthlyTotal.toLocaleString()}
                         </p>
                     </div>
@@ -123,7 +123,7 @@ export default function Calendar({
                         <p className="text-xs font-bold text-brand-600 dark:text-brand-300">
                             多い日 {highSpendingDayCount}日
                         </p>
-                        <p className="text-[11px] text-neutral-400 mt-0.5">{paydayLabel}</p>
+                        <p className="text-[11px] text-neutral-400 mt-0.5 dark:text-neutral-400">{paydayLabel}</p>
                     </div>
                 </Card>
 
@@ -173,7 +173,12 @@ export default function Calendar({
                                     key={cellIndex}
                                     onClick={() => setSelectedDay(dayNumber)}
                                     className={`aspect-[3/4] flex flex-col items-center pt-2 px-0.5
-                                                bg-white dark:bg-neutral-900
+                                                bg-white dark:bg-neutral-900 dark:text-neutral-100
+                                                hover:ring-1 hover:ring-inset hover:ring-neutral-300
+                                                dark:hover:ring-neutral-600
+                                                focus-visible:outline-none focus-visible:ring-2
+                                                focus-visible:ring-inset focus-visible:ring-brand-500
+                                                dark:focus-visible:ring-brand-300
                                                 active:bg-neutral-100 dark:active:bg-neutral-800
                                                 transition ${heatmapClassName}`}
                                 >
@@ -183,7 +188,7 @@ export default function Calendar({
                                     </span>
 
                                     {spendingAmount && (
-                                        <span className="mt-1 text-[9px] tabular-nums font-bold text-expense">
+                                        <span className="mt-1 text-[9px] tabular-nums font-bold text-expense dark:text-red-300">
                                             {spendingAmount.toLocaleString()}
                                         </span>
                                     )}
@@ -194,7 +199,7 @@ export default function Calendar({
                 </section>
 
                 {/* ---------- ヒートマップの凡例 ---------- */}
-                <p className="mt-3 flex items-center justify-between text-[11px] text-neutral-400 px-1">
+                <p className="mt-3 flex items-center justify-between text-[11px] text-neutral-400 px-1 dark:text-neutral-400">
                     少ない
                     <span className="flex gap-1">
                         {HEATMAP_LEVEL_CLASSNAMES.map((levelClassName) => (
