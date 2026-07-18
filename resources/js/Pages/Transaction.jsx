@@ -169,7 +169,7 @@ function TransactionCard({ transaction }) {
 }
 
 function formatDate(dateText) {
-    const date = new Date(dateText);
+    const [year, month, day] = dateText.split('-');
 
-    return `${date.getMonth() + 1}月${date.getDate()}日`;
+    return `${Number(year)}年${Number(month)}月${Number(day)}日`;
 }
