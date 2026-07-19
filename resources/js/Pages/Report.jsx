@@ -65,44 +65,33 @@ export default function Report({ report = demoReport }) {
                 <Card className="p-5">
                     <h2 className="text-base font-bold">今月の支出内訳</h2>
 
-                    <div
-                        aria-label="カテゴリ別の支出割合"
-                        className="mt-4 flex h-3 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800"
-                        role="img"
-                    >
-                        {categories.map((category) => (
-                            <div
-                                key={category.key}
-                                className={
-                                    categoryColorClassNames[category.key] ??
-                                    categoryColorClassNames.other
-                                }
-                                style={{
-                                    width: `${clampPercentage(category.percentage)}%`,
-                                }}
-                            />
-                        ))}
-                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-2 overflow-hidden">
+                        <div
+                            className={`flex min-h-44 min-w-0 flex-col items-center justify-center rounded-2xl p-3 text-center text-neutral-950 ${categoryColorClassNames[categories[0].key] ?? categoryColorClassNames.other}`}
+                        >
+                            <p className="max-w-full break-words text-sm font-bold leading-tight">
+                                {categories[0].name}
+                            </p>
+                            <p className="mt-2 max-w-full text-3xl font-extrabold leading-none tabular-nums">
+                                {clampPercentage(categories[0].percentage)}%
+                            </p>
+                        </div>
 
-                    <div className="mt-5 grid grid-cols-2 gap-3">
-                        {categories.map((category) => (
-                            <div
-                                key={category.key}
-                                className="flex items-center justify-between rounded-xl bg-neutral-50 px-3 py-2 dark:bg-neutral-800"
-                            >
-                                <div className="flex min-w-0 items-center gap-2">
-                                    <span
-                                        className={`h-2.5 w-2.5 shrink-0 rounded-full ${categoryColorClassNames[category.key] ?? categoryColorClassNames.other}`}
-                                    />
-                                    <span className="truncate text-sm">
+                        <div className="grid min-w-0 grid-cols-2 grid-rows-2 gap-2">
+                            {categories.slice(1).map((category) => (
+                                <div
+                                    key={category.key}
+                                    className={`flex min-w-0 flex-col items-center justify-center rounded-xl p-2 text-center text-neutral-950 ${categoryColorClassNames[category.key] ?? categoryColorClassNames.other}`}
+                                >
+                                    <p className="max-w-full break-words text-xs font-bold leading-tight">
                                         {category.name}
-                                    </span>
+                                    </p>
+                                    <p className="mt-1 max-w-full text-lg font-extrabold leading-none tabular-nums">
+                                        {clampPercentage(category.percentage)}%
+                                    </p>
                                 </div>
-                                <span className="ml-2 shrink-0 text-sm font-bold tabular-nums">
-                                    {clampPercentage(category.percentage)}%
-                                </span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </Card>
 
