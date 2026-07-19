@@ -1,8 +1,7 @@
 // ============================================================
 // 貼り付け先: resources/js/Pages/Calendar.jsx（新規作成）
-// 役割: カレンダー画面。セル区切りのグリッド型デザイン
-//       （日曜=赤・土曜=青・選択日は丸ハイライト）で、
-//       日別の支出額とヒートマップの濃淡を表示する。
+// 役割: カレンダー画面。長方形の日付セルと支出レベルを表示し、
+//       選択した日の支出額を確認できる。
 // ============================================================
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -98,52 +97,68 @@ export default function Calendar({
     // ヒートマップの基準になる、その月の最大支出額。
     // 支出が1件もない月でも 0 除算にならないよう最低値を 1 にしている。
     const maxSpendingAmount = Math.max(1, ...Object.values(dailySpending));
+    const selectedSpendingAmount =
+        selectedDay === null ? null : (dailySpending[selectedDay] ?? 0);
 
     return (
         <AuthenticatedLayout>
             <Head title="カレンダー" />
 
-            <div className="mx-auto max-w-md px-5 pb-8 pt-4 dark:text-neutral-100">
-                <header className="pb-3">
-                    <h1 className="text-xl font-extrabold tracking-tight dark:text-neutral-50">カレンダー</h1>
-                    <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-400">
-                        {year}年{month}月
+            <div className="mx-auto max-w-lg px-4 pb-8 pt-6 text-neutral-900 dark:text-neutral-100 sm:px-6">
+                <header>
+                    <h1 className="text-2xl font-extrabold tracking-tight dark:text-neutral-50">
+                        カレンダー
+                    </h1>
+                    <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                        日ごとの支出を確認できます
                     </p>
                 </header>
 
-                {/* ---------- 今月の支出サマリー ---------- */}
-                <Card as="section" className="p-4 flex items-center justify-between">
-                    <div>
-                        <p className="text-xs text-neutral-500 dark:text-neutral-300">今月の支出</p>
-                        <p className="tabular-nums text-2xl font-extrabold mt-0.5 dark:text-neutral-50">
-                            ¥{monthlyTotal.toLocaleString()}
-                        </p>
+                <Card
+                    as="section"
+                    className="mt-4 overflow-hidden border border-neutral-200 dark:border-neutral-800"
+                >
+                    <div className="flex items-end justify-between gap-4 p-4">
+                        <div>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                対象年月
+                            </p>
+                            <p className="mt-1 text-lg font-bold dark:text-neutral-50">
+                                {year}年{month}月
+                            </p>
+                        </div>
+                        <div className="min-w-0 text-right">
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                                今月の支出
+                            </p>
+                            <p className="mt-1 truncate text-xl font-extrabold tabular-nums dark:text-neutral-50 sm:text-2xl">
+                                ¥{monthlyTotal.toLocaleString()}
+                            </p>
+                        </div>
                     </div>
-                    <div className="text-right">
-                        <p className="text-xs font-bold text-brand-600 dark:text-brand-300">
+                    <div className="flex items-center justify-between gap-3 border-t border-neutral-100 px-4 py-2.5 text-[11px] dark:border-neutral-800">
+                        <p className="font-bold text-brand-600 dark:text-brand-300">
                             多い日 {highSpendingDayCount}日
                         </p>
-                        <p className="text-[11px] text-neutral-400 mt-0.5 dark:text-neutral-400">{paydayLabel}</p>
+                        <p className="text-neutral-400 dark:text-neutral-400">
+                            {paydayLabel}
+                        </p>
                     </div>
                 </Card>
 
-                {/* ---------- カレンダー本体（セル区切りのグリッド型） ---------- */}
-                <section className="mt-4 rounded-2xl overflow-hidden
-                                    bg-white dark:bg-black
-                                    border border-neutral-200 dark:border-neutral-800">
-
-                    {/* 曜日ヘッダー */}
-                    <div className="grid grid-cols-7 text-center text-xs font-bold py-3
-                                    text-neutral-500 dark:text-neutral-300">
+                <section className="mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none">
+                    <div className="grid grid-cols-7 bg-neutral-50 py-2.5 text-center text-xs font-bold text-neutral-500 dark:bg-neutral-950 dark:text-neutral-300">
                         {WEEKDAY_HEADERS.map((weekday) => (
-                            <span key={weekday.label} className={weekday.colorClassName}>
+                            <span
+                                key={weekday.label}
+                                className={weekday.colorClassName}
+                            >
                                 {weekday.label}
                             </span>
                         ))}
                     </div>
 
-                    {/* 日付セル。gap-px と背景色でセル間の細い区切り線を表現している */}
-                    <div className="grid grid-cols-7 gap-px bg-neutral-200 dark:bg-neutral-800">
+                    <div className="grid grid-cols-7 gap-px border-t border-neutral-200 bg-neutral-200 dark:border-neutral-800 dark:bg-neutral-800">
                         {calendarCells.map((dayNumber, cellIndex) => {
                             const isBlankCell = (dayNumber === null);
 
@@ -151,67 +166,112 @@ export default function Calendar({
                                 return (
                                     <div
                                         key={cellIndex}
-                                        className="aspect-[3/4] bg-neutral-50 dark:bg-black"
+                                        aria-hidden="true"
+                                        className="min-h-16 min-w-0 bg-neutral-50/80 dark:bg-neutral-950/80 sm:min-h-20"
                                     />
                                 );
                             }
 
                             const spendingAmount = dailySpending[dayNumber];
                             const isSelected = (dayNumber === selectedDay);
+                            const isToday =
+                                isCurrentMonth && dayNumber === today.getDate();
+                            const weekdayIndex = cellIndex % 7;
+                            const isSunday = weekdayIndex === 0;
+                            const isSaturday = weekdayIndex === 6;
                             const heatmapClassName =
                                 getHeatmapClassName(spendingAmount, maxSpendingAmount);
 
-                            // 選択中の日付は数字を丸で囲んで強調する
-                            let dayNumberClassName = '';
+                            let dayNumberClassName =
+                                'text-neutral-700 dark:text-neutral-200';
                             if (isSelected) {
                                 dayNumberClassName =
-                                    'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-bold';
+                                    'bg-brand-600 font-bold text-white shadow-sm dark:bg-neutral-100 dark:text-neutral-900';
+                            } else if (isToday) {
+                                dayNumberClassName =
+                                    'font-semibold text-brand-700 ring-2 ring-inset ring-brand-500 dark:text-brand-300 dark:ring-brand-400';
+                            } else if (isSunday) {
+                                dayNumberClassName =
+                                    'text-red-500 dark:text-red-300';
+                            } else if (isSaturday) {
+                                dayNumberClassName =
+                                    'text-blue-500 dark:text-blue-300';
                             }
 
                             return (
                                 <button
                                     key={cellIndex}
+                                    type="button"
                                     onClick={() => setSelectedDay(dayNumber)}
-                                    className={`aspect-[3/4] flex flex-col items-center pt-2 px-0.5
-                                                bg-white dark:bg-neutral-900 dark:text-neutral-100
-                                                hover:ring-1 hover:ring-inset hover:ring-neutral-300
-                                                dark:hover:ring-neutral-600
-                                                focus-visible:outline-none focus-visible:ring-2
-                                                focus-visible:ring-inset focus-visible:ring-brand-500
-                                                dark:focus-visible:ring-brand-300
-                                                active:bg-neutral-100 dark:active:bg-neutral-800
-                                                transition ${heatmapClassName}`}
+                                    aria-pressed={isSelected}
+                                    aria-label={`${year}年${month}月${dayNumber}日${isToday ? '、今日' : ''}${spendingAmount ? `、支出${spendingAmount.toLocaleString()}円` : '、支出なし'}`}
+                                    className={`flex min-h-16 min-w-0 flex-col items-center bg-white px-0.5 py-1.5 text-center transition hover:ring-1 hover:ring-inset hover:ring-neutral-300 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 active:brightness-95 dark:bg-neutral-900 dark:hover:ring-neutral-600 dark:focus-visible:ring-brand-300 sm:min-h-20 sm:py-2 ${heatmapClassName}`}
                                 >
-                                    <span className={`size-7 flex items-center justify-center rounded-full
-                                                      text-sm tabular-nums font-medium ${dayNumberClassName}`}>
+                                    <span
+                                        className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-medium tabular-nums ${dayNumberClassName}`}
+                                    >
                                         {dayNumber}
                                     </span>
 
                                     {spendingAmount && (
-                                        <span className="mt-1 text-[9px] tabular-nums font-bold text-expense dark:text-red-300">
-                                            {spendingAmount.toLocaleString()}
+                                        <span
+                                            className="mt-auto max-w-full truncate whitespace-nowrap text-[8px] font-bold tabular-nums text-expense dark:text-red-300 sm:text-[10px]"
+                                        >
+                                            ¥{spendingAmount.toLocaleString()}
                                         </span>
                                     )}
                                 </button>
                             );
                         })}
                     </div>
+
+                    <p className="flex items-center justify-between border-t border-neutral-100 bg-white px-4 py-3 text-[11px] text-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+                        少ない
+                        <span className="flex gap-1">
+                            {HEATMAP_LEVEL_CLASSNAMES.map((levelClassName) => (
+                                <span
+                                    key={levelClassName}
+                                    aria-hidden="true"
+                                    className={`size-3 rounded-full border border-neutral-200 dark:border-neutral-700 ${levelClassName}`}
+                                />
+                            ))}
+                        </span>
+                        多い
+                    </p>
                 </section>
 
-                {/* ---------- ヒートマップの凡例 ---------- */}
-                <p className="mt-3 flex items-center justify-between text-[11px] text-neutral-400 px-1 dark:text-neutral-400">
-                    少ない
-                    <span className="flex gap-1">
-                        {HEATMAP_LEVEL_CLASSNAMES.map((levelClassName) => (
-                            <span
-                                key={levelClassName}
-                                className={`size-3 rounded ${levelClassName}
-                                            border border-neutral-200 dark:border-neutral-700`}
-                            />
-                        ))}
-                    </span>
-                    多い
-                </p>
+                <Card
+                    as="section"
+                    aria-live="polite"
+                    className="mt-4 border border-neutral-200 p-4 dark:border-neutral-800"
+                >
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                        選択日の支出
+                    </p>
+                    {selectedDay === null ? (
+                        <p className="mt-2 text-sm font-semibold text-neutral-700 dark:text-neutral-200">
+                            日付を選択してください
+                        </p>
+                    ) : (
+                        <div className="mt-2 flex items-end justify-between gap-3">
+                            <p className="font-bold dark:text-neutral-50">
+                                {year}年{month}月{selectedDay}日
+                            </p>
+                            {selectedSpendingAmount > 0 ? (
+                                <p className="shrink-0 text-sm text-neutral-600 dark:text-neutral-300">
+                                    支出：
+                                    <span className="font-bold tabular-nums text-expense dark:text-red-300">
+                                        {selectedSpendingAmount.toLocaleString()}円
+                                    </span>
+                                </p>
+                            ) : (
+                                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                                    支出はありません
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </Card>
             </div>
         </AuthenticatedLayout>
     );
