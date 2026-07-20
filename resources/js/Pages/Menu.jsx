@@ -141,7 +141,7 @@ export default function Menu() {
                                         aria-pressed={isSelected}
                                         onClick={() => setTheme(option.value)}
                                         className={[
-                                            'min-w-0 whitespace-nowrap rounded-xl border px-1 py-2.5 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-900',
+                                            'inline-flex min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-xl border px-1 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-900',
                                             isSelected
                                                 ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-800/40 dark:text-brand-300'
                                                 : 'border-neutral-200 bg-white text-neutral-500 hover:border-brand-300 hover:text-brand-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-brand-600 dark:hover:text-brand-300',
