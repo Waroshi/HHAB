@@ -16,9 +16,10 @@ const commonSvgAttributes = {
 // アイコンコンポーネントを生成するヘルパー。
 // 各アイコンで <svg> の枠組みを毎回書かずに済むようにしている。
 function createIcon(svgPaths) {
-    return function Icon({ size = 22, className = '' }) {
+    return function Icon({ size = 22, className = '', ...svgProps }) {
         return (
             <svg
+                {...svgProps}
                 viewBox="0 0 24 24"
                 width={size}
                 height={size}
