@@ -146,7 +146,7 @@ export default function Calendar({
                     </div>
                 </Card>
 
-                <section className="mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none">
+                <section className="-mx-4 mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none sm:mx-0">
                     <div className="grid grid-cols-7 bg-neutral-50 py-2.5 text-center text-xs font-bold text-neutral-500 dark:bg-neutral-950 dark:text-neutral-300">
                         {WEEKDAY_HEADERS.map((weekday) => (
                             <span
@@ -205,7 +205,7 @@ export default function Calendar({
                                     onClick={() => setSelectedDay(dayNumber)}
                                     aria-pressed={isSelected}
                                     aria-label={`${year}年${month}月${dayNumber}日${isToday ? '、今日' : ''}${spendingAmount ? `、支出${spendingAmount.toLocaleString()}円` : '、支出なし'}`}
-                                    className={`flex min-h-16 min-w-0 flex-col items-center bg-white px-0.5 py-1.5 text-center transition hover:ring-1 hover:ring-inset hover:ring-neutral-300 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 active:brightness-95 dark:bg-neutral-900 dark:hover:ring-neutral-600 dark:focus-visible:ring-brand-300 sm:min-h-20 sm:py-2 ${heatmapClassName}`}
+                                    className={`flex h-full min-h-16 min-w-0 w-full touch-manipulation flex-col items-center bg-white px-0.5 py-1.5 text-center transition hover:ring-1 hover:ring-inset hover:ring-neutral-300 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 active:brightness-95 dark:bg-neutral-900 dark:hover:ring-neutral-600 dark:focus-visible:ring-brand-300 sm:min-h-20 sm:py-2 ${heatmapClassName}`}
                                 >
                                     <span
                                         className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-medium tabular-nums ${dayNumberClassName}`}
