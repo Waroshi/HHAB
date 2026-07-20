@@ -4,7 +4,7 @@
 //       <input type="file" capture="environment"> でスマホの背面カメラを起動し、
 //       撮影した画像をプレビューし、読み取り結果画面へ進む。
 // ============================================================
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { BackIcon } from '../Components/Icons';
 
@@ -23,6 +23,16 @@ export default function Scan() {
     const fileInputRef = useRef(null);
     const [previewImageUrl, setPreviewImageUrl] = useState(null);
     const [isReading, setIsReading] = useState(false);
+
+    useEffect(() => {
+        if (!previewImageUrl) {
+            return undefined;
+        }
+
+        return () => {
+            URL.revokeObjectURL(previewImageUrl);
+        };
+    }, [previewImageUrl]);
 
     // ファイル選択（＝カメラ撮影）が完了したときの処理。
     // プレビューを表示しつつ、読み取り結果画面へ進む。
