@@ -62,37 +62,47 @@ export default function Report({ report = demoReport }) {
                     </p>
                 </header>
 
+                <p className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">
+                    デモ表示：現在は確認用の固定データを表示しています
+                </p>
+
                 <Card className="p-5">
                     <h2 className="text-base font-bold">今月の支出内訳</h2>
 
-                    <div className="mt-4 grid grid-cols-2 gap-2 overflow-hidden">
-                        <div
-                            className={`flex min-h-44 min-w-0 flex-col items-center justify-center rounded-2xl p-3 text-center text-neutral-950 ${categoryColorClassNames[categories[0].key] ?? categoryColorClassNames.other}`}
-                        >
-                            <p className="max-w-full break-words text-sm font-bold leading-tight">
-                                {categories[0].name}
-                            </p>
-                            <p className="mt-2 max-w-full text-3xl font-extrabold leading-none tabular-nums">
-                                {clampPercentage(categories[0].percentage)}%
-                            </p>
-                        </div>
+                    {categories.length > 0 ? (
+                        <div className="mt-4 grid grid-cols-2 gap-2 overflow-hidden">
+                            <div
+                                className={`flex min-h-44 min-w-0 flex-col items-center justify-center rounded-2xl p-3 text-center text-neutral-950 ${categoryColorClassNames[categories[0].key] ?? categoryColorClassNames.other}`}
+                            >
+                                <p className="max-w-full break-words text-sm font-bold leading-tight">
+                                    {categories[0].name}
+                                </p>
+                                <p className="mt-2 max-w-full text-3xl font-extrabold leading-none tabular-nums">
+                                    {clampPercentage(categories[0].percentage)}%
+                                </p>
+                            </div>
 
-                        <div className="grid min-w-0 grid-cols-2 grid-rows-2 gap-2">
-                            {categories.slice(1).map((category) => (
-                                <div
-                                    key={category.key}
-                                    className={`flex min-w-0 flex-col items-center justify-center rounded-xl p-2 text-center text-neutral-950 ${categoryColorClassNames[category.key] ?? categoryColorClassNames.other}`}
-                                >
-                                    <p className="max-w-full break-words text-xs font-bold leading-tight">
-                                        {category.name}
-                                    </p>
-                                    <p className="mt-1 max-w-full text-lg font-extrabold leading-none tabular-nums">
-                                        {clampPercentage(category.percentage)}%
-                                    </p>
-                                </div>
-                            ))}
+                            <div className="grid min-w-0 grid-cols-2 grid-rows-2 gap-2">
+                                {categories.slice(1).map((category) => (
+                                    <div
+                                        key={category.key}
+                                        className={`flex min-w-0 flex-col items-center justify-center rounded-xl p-2 text-center text-neutral-950 ${categoryColorClassNames[category.key] ?? categoryColorClassNames.other}`}
+                                    >
+                                        <p className="max-w-full break-words text-xs font-bold leading-tight">
+                                            {category.name}
+                                        </p>
+                                        <p className="mt-1 max-w-full text-lg font-extrabold leading-none tabular-nums">
+                                            {clampPercentage(category.percentage)}%
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <p className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">
+                            支出内訳のデータがありません
+                        </p>
+                    )}
                 </Card>
 
                 <Card className="mt-4 border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/30">
