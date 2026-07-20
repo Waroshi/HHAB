@@ -60,7 +60,7 @@ function BudgetProgressRing({ percentage }) {
         circumference * (1 - normalizedPercentage / 100);
 
     return (
-        <div className="relative size-28 shrink-0">
+        <div className="relative size-24 shrink-0 sm:size-28">
             <svg
                 viewBox="0 0 100 100"
                 className="size-full -rotate-90"
@@ -89,7 +89,7 @@ function BudgetProgressRing({ percentage }) {
             </svg>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="tabular-nums text-2xl font-extrabold">
+                <span className="tabular-nums text-xl font-extrabold sm:text-2xl">
                     {normalizedPercentage}%
                 </span>
                 <span className="text-[10px] text-neutral-500 dark:text-neutral-400">
@@ -132,6 +132,11 @@ export default function Dashboard({ summary = demoSummary }) {
                         </p>
                     </div>
 
+                    <p className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs leading-relaxed text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
+                        <span className="font-bold">デモ表示：</span>
+                        現在は確認用の固定データを表示しています
+                    </p>
+
                     <Card as="section" className="p-5">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5 text-sm font-bold">
@@ -141,7 +146,7 @@ export default function Dashboard({ summary = demoSummary }) {
                                     className="text-neutral-400"
                                 />
                             </div>
-                            <span className="text-xs font-bold text-brand-600 dark:text-brand-300">
+                            <span className="shrink-0 rounded-full border border-neutral-200 bg-neutral-50 px-2 py-1 text-[10px] font-medium text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
                                 予算設定
                             </span>
                         </div>
@@ -150,17 +155,17 @@ export default function Dashboard({ summary = demoSummary }) {
                             {displaySummary.period}
                         </p>
 
-                        <div className="mt-4 flex items-center gap-5">
+                        <div className="mt-4 flex items-center gap-3 sm:gap-5">
                             <BudgetProgressRing
                                 percentage={displaySummary.usedRatePercent}
                             />
 
-                            <div className="flex-1 space-y-3">
-                                <div>
+                            <div className="min-w-0 flex-1 space-y-3">
+                                <div className="min-w-0">
                                     <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                                         予算のこり
                                     </p>
-                                    <p className="tabular-nums text-2xl font-extrabold text-brand-600 dark:text-brand-300">
+                                    <p className="max-w-full break-words text-xl font-extrabold leading-tight tabular-nums text-brand-600 dark:text-brand-300 sm:text-2xl">
                                         ¥
                                         {Number(
                                             displaySummary.remainingBudget,
@@ -168,11 +173,11 @@ export default function Dashboard({ summary = demoSummary }) {
                                     </p>
                                 </div>
 
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                                         1日あたりの予算
                                     </p>
-                                    <p className="tabular-nums text-lg font-bold">
+                                    <p className="max-w-full break-words text-base font-bold leading-tight tabular-nums sm:text-lg">
                                         ¥
                                         {Number(
                                             displaySummary.dailyBudget,
@@ -197,27 +202,33 @@ export default function Dashboard({ summary = demoSummary }) {
                     </section>
 
                     <Card as="section" className="mt-4 p-5">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                             <h2 className="text-sm font-bold">最近の取引</h2>
                             <Link
                                 href={route('transactions.index')}
-                                className="flex items-center text-xs font-bold text-brand-600 dark:text-brand-300"
+                                className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg px-2 text-xs font-bold text-brand-600 transition hover:bg-brand-50 hover:text-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-brand-300 dark:hover:bg-brand-800/40 dark:hover:text-brand-200 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-900"
                             >
                                 すべて見る
                                 <ChevronRightIcon size={14} />
                             </Link>
                         </div>
 
-                        <div className="mt-1 divide-y divide-neutral-100 dark:divide-neutral-800">
-                            {displaySummary.recentTransactions.map(
-                                (transaction) => (
-                                    <TransactionItem
-                                        key={transaction.id}
-                                        transaction={transaction}
-                                    />
-                                ),
-                            )}
-                        </div>
+                        {displaySummary.recentTransactions.length > 0 ? (
+                            <div className="mt-1 divide-y divide-neutral-100 dark:divide-neutral-800">
+                                {displaySummary.recentTransactions.map(
+                                    (transaction) => (
+                                        <TransactionItem
+                                            key={transaction.id}
+                                            transaction={transaction}
+                                        />
+                                    ),
+                                )}
+                            </div>
+                        ) : (
+                            <p className="mt-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-4 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:bg-neutral-950/50 dark:text-neutral-400">
+                                最近の取引はありません
+                            </p>
+                        )}
                     </Card>
                 </div>
             </div>
