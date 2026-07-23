@@ -21,33 +21,13 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->name('dashboard');
+
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-
-    Route::get('/scan', function () {
-        return Inertia::render('Scan');
-    })->name('readings.index');
-
-    Route::get('/scan/result', function () {
-        return Inertia::render('ReadingResult');
-    })->name('readings.result');
-
-    Route::get('/calendar', function () {
-        return Inertia::render('Calendar');
-    })->name('calendar.index');
-
-    Route::get('/reports', function () {
-        return Inertia::render('Report');
-    })->name('reports.index');
-
-    Route::get('/menu', function () {
-        return Inertia::render('Menu');
-    })->name('menu.index');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
