@@ -23,6 +23,18 @@ Route::get('/dashboard', function () {
 
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
+Route::get('/readings', function () {
+    return Inertia::render('Readings');
+})->name('readings.index');
+
+Route::get('/calendar', function () {
+    return Inertia::render('Calendar/Index');
+})->name('calendar.index');
+
+Route::get('/reports', function () {
+    return Inertia::render('Reports/Index');
+})->name('reports.index');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

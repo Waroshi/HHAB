@@ -108,7 +108,7 @@ export default function Transaction({
                 </div>
             </section>
 
-            {/* <BottomNavbar /> */}
+            {/* <ButtonNavBar /> */}
         </main>
     );
 }
