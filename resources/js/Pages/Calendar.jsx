@@ -89,6 +89,12 @@ export default function Calendar({
     }
 
     const [selectedDay, setSelectedDay] = useState(initialSelectedDay);
+    const safeDailySpending =
+        dailySpending &&
+        typeof dailySpending === 'object' &&
+        !Array.isArray(dailySpending)
+            ? dailySpending
+            : {};
 
     const calendarCells = useMemo(() => {
         return buildCalendarCells(year, month);
@@ -96,9 +102,12 @@ export default function Calendar({
 
     // ヒートマップの基準になる、その月の最大支出額。
     // 支出が1件もない月でも 0 除算にならないよう最低値を 1 にしている。
-    const maxSpendingAmount = Math.max(1, ...Object.values(dailySpending));
+    const maxSpendingAmount = Math.max(
+        1,
+        ...Object.values(safeDailySpending),
+    );
     const selectedSpendingAmount =
-        selectedDay === null ? null : (dailySpending[selectedDay] ?? 0);
+        selectedDay === null ? null : (safeDailySpending[selectedDay] ?? 0);
 
     return (
         <AuthenticatedLayout>
@@ -172,7 +181,8 @@ export default function Calendar({
                                 );
                             }
 
-                            const spendingAmount = dailySpending[dayNumber];
+                            const spendingAmount =
+                                safeDailySpending[dayNumber];
                             const isSelected = (dayNumber === selectedDay);
                             const isToday =
                                 isCurrentMonth && dayNumber === today.getDate();

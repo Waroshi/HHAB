@@ -12,10 +12,19 @@ const BUTTON_VARIANT_CLASS_NAMES = {
                   flex items-center justify-center gap-2 transition active:scale-[0.98]`,
 };
 
-export default function Button({ children, variant, className = '', ...props }) {
+export default function Button({
+    children,
+    variant = 'primary',
+    className = '',
+    ...props
+}) {
+    const variantClassName =
+        BUTTON_VARIANT_CLASS_NAMES[variant] ??
+        BUTTON_VARIANT_CLASS_NAMES.primary;
+
     return (
         <button
-            className={`${BUTTON_VARIANT_CLASS_NAMES[variant]} ${className}`}
+            className={`${variantClassName} ${className}`}
             {...props}
         >
             {children}

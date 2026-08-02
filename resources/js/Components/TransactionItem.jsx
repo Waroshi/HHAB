@@ -34,6 +34,10 @@ export default function TransactionItem({ transaction }) {
         type = 'expense',
         amount = 0,
     } = transaction ?? {};
+    const displayCategory =
+        typeof category === 'string' && category.length > 0
+            ? category
+            : 'その他';
     const isIncome = type === 'income';
     const amountSign = isIncome ? '+' : '-';
     const amountColorClassName = isIncome
@@ -46,13 +50,13 @@ export default function TransactionItem({ transaction }) {
 
     return (
         <article className="flex items-center gap-3 py-3">
-            <CategoryBadge categoryName={category} />
+            <CategoryBadge categoryName={displayCategory} />
 
             <div className="min-w-0 flex-1">
                 <p className="text-[11px] text-neutral-400">{date}</p>
                 <p className="truncate text-sm font-bold">{store}</p>
                 <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    {isIncome ? '収入' : '支出'}・{category}・{method}
+                    {isIncome ? '収入' : '支出'}・{displayCategory}・{method}
                 </p>
             </div>
 
