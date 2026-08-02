@@ -42,9 +42,14 @@ export default function Scan() {
             return;
         }
 
-        setPreviewImageUrl(URL.createObjectURL(selectedFile));
-        setIsReading(true);
+        const previewUrl = URL.createObjectURL(selectedFile);
+        setPreviewImageUrl(previewUrl);
 
+        if (!route().has('readings.result')) {
+            return;
+        }
+
+        setIsReading(true);
         router.visit(route('readings.result'), {
             onFinish: () => setIsReading(false),
         });

@@ -7,6 +7,8 @@ import BottomNavBar from '@/Components/BottomNavBar';
 import { Link } from '@inertiajs/react';
 
 export default function AuthenticatedLayout({ header, children }) {
+    const hasMenuRoute = route().has('menu.index');
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-neutral-950">
             <header className="border-b border-neutral-200 bg-white text-neutral-900 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-100">
@@ -18,26 +20,28 @@ export default function AuthenticatedLayout({ header, children }) {
                         HHAB
                     </Link>
 
-                    <Link
-                        href={route('menu.index')}
-                        aria-label="メニューを開く"
-                        className="inline-flex size-11 items-center justify-center rounded-md text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-950"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            className="size-6"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
+                    {hasMenuRoute && (
+                        <Link
+                            href={route('menu.index')}
+                            aria-label="メニューを開く"
+                            className="inline-flex size-11 items-center justify-center rounded-md text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-950"
                         >
-                            <path
-                                d="M4 6h16M4 12h16M4 18h16"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                            />
-                        </svg>
-                    </Link>
+                            <svg
+                                aria-hidden="true"
+                                className="size-6"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                />
+                            </svg>
+                        </Link>
+                    )}
                 </div>
             </header>
 
