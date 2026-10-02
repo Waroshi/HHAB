@@ -1,11 +1,28 @@
 // resources/js/Pages/Transaction.jsx
 // Shows the mobile transaction list screen.
 // Exists so users can search and filter income and expense transactions.
-// RELATED FILES: app/Http/Controllers/TransactionController.php, resources/js/Components/BottomNavbar.jsx, routes/web.php
+// RELATED FILES: app/Http/Controllers/TransactionController.php, routes/web.php
 
-import BottomNavbar from '@/Components/BottomNavbar';
 import { Head, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
+
+// 取引を表示順のまま日付別にまとめる。
+// 同じ日付が初めて現れたときだけ、その日の配列を用意する。
+function groupTransactionsByDate(transactions) {
+    const groupedTransactions = {};
+
+    for (const transaction of transactions) {
+        const date = formatDate(transaction.date);
+
+        if (!groupedTransactions[date]) {
+            groupedTransactions[date] = [];
+        }
+
+        groupedTransactions[date].push(transaction);
+    }
+
+    return groupedTransactions;
+}
 
 export default function Transaction({
     transactions = [],
@@ -14,19 +31,10 @@ export default function Transaction({
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
 
-    const groupedTransactions = useMemo(() => {
-        return transactions.reduce((groups, transaction) => {
-            const date = formatDate(transaction.date);
-
-            if (!groups[date]) {
-                groups[date] = [];
-            }
-
-            groups[date].push(transaction);
-
-            return groups;
-        }, {});
-    }, [transactions]);
+    const groupedTransactions = useMemo(
+        () => groupTransactionsByDate(transactions),
+        [transactions],
+    );
 
     const applyFilters = (nextFilters) => {
         router.get(
@@ -111,8 +119,6 @@ export default function Transaction({
                     ))}
                 </div>
             </section>
-
-            {/* <BottomNavbar /> */}
         </main>
     );
 }

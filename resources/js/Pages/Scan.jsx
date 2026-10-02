@@ -24,6 +24,8 @@ export default function Scan() {
     const [previewImageUrl, setPreviewImageUrl] = useState(null);
     const [isReading, setIsReading] = useState(false);
 
+    // プレビュー画像が切り替わる直前と、この画面を離れるときに、
+    // 使い終わった Object URL を解放してブラウザ上のメモリに残さない。
     useEffect(() => {
         if (!previewImageUrl) {
             return undefined;

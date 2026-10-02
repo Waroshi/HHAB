@@ -36,7 +36,7 @@ const HEATMAP_LEVEL_CLASSNAMES = [
 // 支出額の大きさに応じてセルの背景の濃さを決める。
 // その月の最大支出額を基準にした相対値で判定する。
 function getHeatmapClassName(spendingAmount, maxSpendingAmount) {
-    if (!spendingAmount) {
+    if (!(spendingAmount > 0)) {
         return '';
     }
 
@@ -140,12 +140,23 @@ export default function Calendar({
                             <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                 今月の支出
                             </p>
-                            <p className="mt-1 truncate text-xl font-extrabold tabular-nums dark:text-neutral-50 sm:text-2xl">
+                            <p
+                                className={[
+                                    'mt-1 truncate text-xl font-extrabold tabular-nums',
+                                    'dark:text-neutral-50 sm:text-2xl',
+                                ].join(' ')}
+                            >
                                 ¥{monthlyTotal.toLocaleString()}
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center justify-between gap-3 border-t border-neutral-100 px-4 py-2.5 text-[11px] dark:border-neutral-800">
+                    <div
+                        className={[
+                            'flex items-center justify-between gap-3 border-t',
+                            'border-neutral-100 px-4 py-2.5 text-[11px]',
+                            'dark:border-neutral-800',
+                        ].join(' ')}
+                    >
                         <p className="font-bold text-brand-600 dark:text-brand-300">
                             多い日 {highSpendingDayCount}日
                         </p>
@@ -155,8 +166,20 @@ export default function Calendar({
                     </div>
                 </Card>
 
-                <section className="-mx-4 mt-4 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none sm:mx-0">
-                    <div className="grid grid-cols-7 bg-neutral-50 py-2.5 text-center text-xs font-bold text-neutral-500 dark:bg-neutral-950 dark:text-neutral-300">
+                <section
+                    className={[
+                        '-mx-4 mt-4 overflow-hidden rounded-2xl border',
+                        'border-neutral-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]',
+                        'dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none sm:mx-0',
+                    ].join(' ')}
+                >
+                    <div
+                        className={[
+                            'grid grid-cols-7 bg-neutral-50 py-2.5 text-center',
+                            'text-xs font-bold text-neutral-500',
+                            'dark:bg-neutral-950 dark:text-neutral-300',
+                        ].join(' ')}
+                    >
                         {WEEKDAY_HEADERS.map((weekday) => (
                             <span
                                 key={weekday.label}
@@ -167,7 +190,12 @@ export default function Calendar({
                         ))}
                     </div>
 
-                    <div className="grid grid-cols-7 gap-px border-t border-neutral-200 bg-neutral-200 dark:border-neutral-800 dark:bg-neutral-800">
+                    <div
+                        className={[
+                            'grid grid-cols-7 gap-px border-t border-neutral-200',
+                            'bg-neutral-200 dark:border-neutral-800 dark:bg-neutral-800',
+                        ].join(' ')}
+                    >
                         {calendarCells.map((dayNumber, cellIndex) => {
                             const isBlankCell = (dayNumber === null);
 
@@ -176,7 +204,10 @@ export default function Calendar({
                                     <div
                                         key={cellIndex}
                                         aria-hidden="true"
-                                        className="min-h-16 min-w-0 bg-neutral-50/80 dark:bg-neutral-950/80 sm:min-h-20"
+                                        className={[
+                                            'min-h-16 min-w-0 bg-neutral-50/80',
+                                            'dark:bg-neutral-950/80 sm:min-h-20',
+                                        ].join(' ')}
                                     />
                                 );
                             }
@@ -191,15 +222,33 @@ export default function Calendar({
                             const isSaturday = weekdayIndex === 6;
                             const heatmapClassName =
                                 getHeatmapClassName(spendingAmount, maxSpendingAmount);
+                            // 正の支出だけを表示し、0や負数が文字として残るのを防ぐ。
+                            const hasSpendingAmount = spendingAmount > 0;
+
+                            let dayDescription =
+                                `${year}年${month}月${dayNumber}日`;
+                            if (isToday) {
+                                dayDescription += '、今日';
+                            }
+                            if (hasSpendingAmount) {
+                                dayDescription +=
+                                    `、支出${spendingAmount.toLocaleString()}円`;
+                            } else {
+                                dayDescription += '、支出なし';
+                            }
 
                             let dayNumberClassName =
                                 'text-neutral-700 dark:text-neutral-200';
                             if (isSelected) {
-                                dayNumberClassName =
-                                    'bg-brand-600 font-bold text-white shadow-sm dark:bg-neutral-100 dark:text-neutral-900';
+                                dayNumberClassName = [
+                                    'bg-brand-600 font-bold text-white shadow-sm',
+                                    'dark:bg-neutral-100 dark:text-neutral-900',
+                                ].join(' ');
                             } else if (isToday) {
-                                dayNumberClassName =
-                                    'font-semibold text-brand-700 ring-2 ring-inset ring-brand-500 dark:text-brand-300 dark:ring-brand-400';
+                                dayNumberClassName = [
+                                    'font-semibold text-brand-700 ring-2 ring-inset',
+                                    'ring-brand-500 dark:text-brand-300 dark:ring-brand-400',
+                                ].join(' ');
                             } else if (isSunday) {
                                 dayNumberClassName =
                                     'text-red-500 dark:text-red-300';
@@ -214,18 +263,38 @@ export default function Calendar({
                                     type="button"
                                     onClick={() => setSelectedDay(dayNumber)}
                                     aria-pressed={isSelected}
-                                    aria-label={`${year}年${month}月${dayNumber}日${isToday ? '、今日' : ''}${spendingAmount ? `、支出${spendingAmount.toLocaleString()}円` : '、支出なし'}`}
-                                    className={`flex h-full min-h-16 min-w-0 w-full touch-manipulation flex-col items-center bg-white px-0.5 py-1.5 text-center transition hover:ring-1 hover:ring-inset hover:ring-neutral-300 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 active:brightness-95 dark:bg-neutral-900 dark:hover:ring-neutral-600 dark:focus-visible:ring-brand-300 sm:min-h-20 sm:py-2 ${heatmapClassName}`}
+                                    aria-label={dayDescription}
+                                    className={[
+                                        'flex h-full min-h-16 min-w-0 w-full',
+                                        'touch-manipulation flex-col items-center',
+                                        'bg-white px-0.5 py-1.5 text-center transition',
+                                        'hover:ring-1 hover:ring-inset hover:ring-neutral-300',
+                                        'focus-visible:relative focus-visible:z-10',
+                                        'focus-visible:outline-none focus-visible:ring-2',
+                                        'focus-visible:ring-inset focus-visible:ring-brand-500',
+                                        'active:brightness-95 dark:bg-neutral-900',
+                                        'dark:hover:ring-neutral-600',
+                                        'dark:focus-visible:ring-brand-300 sm:min-h-20 sm:py-2',
+                                        heatmapClassName,
+                                    ].join(' ')}
                                 >
                                     <span
-                                        className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-medium tabular-nums ${dayNumberClassName}`}
+                                        className={[
+                                            'flex size-8 shrink-0 items-center justify-center',
+                                            'rounded-full text-sm font-medium tabular-nums',
+                                            dayNumberClassName,
+                                        ].join(' ')}
                                     >
                                         {dayNumber}
                                     </span>
 
-                                    {spendingAmount && (
+                                    {hasSpendingAmount && (
                                         <span
-                                            className="mt-auto max-w-full truncate whitespace-nowrap text-[8px] font-bold tabular-nums text-expense dark:text-red-300 sm:text-[10px]"
+                                            className={[
+                                                'mt-auto max-w-full truncate whitespace-nowrap',
+                                                'text-[8px] font-bold tabular-nums text-expense',
+                                                'dark:text-red-300 sm:text-[10px]',
+                                            ].join(' ')}
                                         >
                                             ¥{spendingAmount.toLocaleString()}
                                         </span>
@@ -235,14 +304,24 @@ export default function Calendar({
                         })}
                     </div>
 
-                    <p className="flex items-center justify-between border-t border-neutral-100 bg-white px-4 py-3 text-[11px] text-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+                    <p
+                        className={[
+                            'flex items-center justify-between border-t border-neutral-100',
+                            'bg-white px-4 py-3 text-[11px] text-neutral-400',
+                            'dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400',
+                        ].join(' ')}
+                    >
                         少ない
                         <span className="flex gap-1">
                             {HEATMAP_LEVEL_CLASSNAMES.map((levelClassName) => (
                                 <span
                                     key={levelClassName}
                                     aria-hidden="true"
-                                    className={`size-3 rounded-full border border-neutral-200 dark:border-neutral-700 ${levelClassName}`}
+                                    className={[
+                                        'size-3 rounded-full border border-neutral-200',
+                                        'dark:border-neutral-700',
+                                        levelClassName,
+                                    ].join(' ')}
                                 />
                             ))}
                         </span>
