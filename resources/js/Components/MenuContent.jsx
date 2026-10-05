@@ -19,7 +19,7 @@ function MenuRow({
     label,
     href,
     disabled = false,
-    onNavigate,
+    onNavigateSuccess,
     onNavigateStart,
 }) {
     const rowContent = (
@@ -63,7 +63,7 @@ function MenuRow({
         <Link
             href={href}
             onStart={onNavigateStart}
-            onSuccess={onNavigate}
+            onSuccess={onNavigateSuccess}
             className="flex min-h-14 items-center gap-3 px-4 py-3.5 transition hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 active:bg-neutral-100 dark:hover:bg-neutral-800/60 dark:focus-visible:ring-brand-300 dark:active:bg-neutral-800"
         >
             {rowContent}
@@ -71,7 +71,7 @@ function MenuRow({
     );
 }
 
-export default function MenuContent({ onNavigate, onNavigateStart }) {
+export default function MenuContent({ onNavigateSuccess, onNavigateStart }) {
     const user = usePage().props.auth?.user;
     const { theme, setTheme } = useContext(MenuThemeContext);
     const userName =
@@ -112,7 +112,7 @@ export default function MenuContent({ onNavigate, onNavigateStart }) {
                     icon={UserIcon}
                     label="プロフィール・アカウント設定"
                     href={route('profile.edit')}
-                    onNavigate={onNavigate}
+                    onNavigateSuccess={onNavigateSuccess}
                     onNavigateStart={onNavigateStart}
                 />
                 <MenuRow icon={TagIcon} label="カテゴリ設定" disabled />
@@ -163,7 +163,7 @@ export default function MenuContent({ onNavigate, onNavigateStart }) {
             <Link
                 href={route('logout')}
                 onStart={onNavigateStart}
-                onSuccess={onNavigate}
+                onSuccess={onNavigateSuccess}
                 method="post"
                 as="button"
                 className="mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-expense/20 bg-white px-4 py-3.5 text-expense transition hover:bg-expense/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-expense focus-visible:ring-offset-2 active:bg-expense/10 dark:border-expense/40 dark:bg-neutral-900 dark:hover:bg-expense/10 dark:focus-visible:ring-offset-neutral-950 dark:active:bg-expense/15"

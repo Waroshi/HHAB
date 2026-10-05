@@ -1,8 +1,4 @@
-// ============================================================
-// 貼り付け先: resources/js/Pages/Calendar.jsx（新規作成）
-// 役割: カレンダー画面。長方形の日付セルと支出レベルを表示し、
-//       選択した日の支出額を確認できる。
-// ============================================================
+// 日ごとの支出を色の濃淡で示し、選択した日の金額を表示する。
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';

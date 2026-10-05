@@ -60,12 +60,12 @@ function collectPositiveSpending(categories) {
         if (!category || typeof category.key !== 'string' || !category.key.trim()
             || typeof category.name !== 'string' || !category.name.trim()) continue;
 
-        const value = category.amount;
-        const isNumericString = typeof value === 'string'
-            && /^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(value.trim());
-        if (typeof value !== 'number' && !isNumericString) continue;
+        const rawAmount = category.amount;
+        const isNumericString = typeof rawAmount === 'string'
+            && /^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(rawAmount.trim());
+        if (typeof rawAmount !== 'number' && !isNumericString) continue;
 
-        const amount = Number(value);
+        const amount = Number(rawAmount);
         if (!Number.isFinite(amount) || amount <= 0) continue;
 
         const existingCategory = categoriesByKey.get(category.key);
@@ -101,13 +101,16 @@ function buildSpendingRectangles(categories, x = 0, y = 0, width = 100, height =
     if (categories.length === 1) return [{ ...categories[0], x, y, width, height }];
 
     const total = categories.reduce((sum, category) => sum + category.amount, 0);
+    const halfTotal = total / 2;
     let splitIndex = 1;
     let firstGroupTotal = categories[0].amount;
     let runningTotal = firstGroupTotal;
 
     for (let index = 1; index < categories.length - 1; index++) {
         runningTotal += categories[index].amount;
-        if (Math.abs(total / 2 - runningTotal) < Math.abs(total / 2 - firstGroupTotal)) {
+        const candidateDifference = Math.abs(halfTotal - runningTotal);
+        const bestDifference = Math.abs(halfTotal - firstGroupTotal);
+        if (candidateDifference < bestDifference) {
             splitIndex = index + 1;
             firstGroupTotal = runningTotal;
         }
@@ -147,6 +150,23 @@ export default function Report({ report, showDemo = false }) {
         ? buildSpendingRectangles(categories)
         : [];
 
+    // 未接続や不正データを「支出0件」と表示しないよう、先に判定する。
+    let spendingDisplayState = 'ready';
+    if (isDisconnected) {
+        spendingDisplayState = 'disconnected';
+    } else if (!hasValidDataShape || !hasValidTotal) {
+        spendingDisplayState = 'invalid';
+    } else if (categories.length === 0) {
+        spendingDisplayState = 'empty';
+    }
+
+    let spendingDescription = '受け取った対象月のデータから、正の支出額だけを集計しています。';
+    if (isDemo) {
+        spendingDescription = 'デモ表示：支出内訳は2026年5月の確認用データです';
+    } else if (isDisconnected) {
+        spendingDescription = '支出内訳は未接続です。対象月とカテゴリ別の支出データを受け取ると表示します。';
+    }
+
     const reportAdvice = report?.advice ?? {};
     const increasedAmount = Number(reportAdvice.increasedAmount);
     const formattedIncreasedAmount = Math.max(
@@ -169,11 +189,7 @@ export default function Report({ report, showDemo = false }) {
                 </header>
 
                 <p className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">
-                    {isDemo
-                        ? 'デモ表示：支出内訳は2026年5月の確認用データです'
-                        : isDisconnected
-                            ? '支出内訳は未接続です。対象月とカテゴリ別の支出データを受け取ると表示します。'
-                            : '受け取った対象月のデータから、正の支出額だけを集計しています。'}
+                    {spendingDescription}
                 </p>
 
                 <Card className="p-5">
@@ -181,15 +197,17 @@ export default function Report({ report, showDemo = false }) {
                         {monthLabel ? `${monthLabel}の支出内訳` : '支出内訳'}
                     </h2>
 
-                    {isDisconnected ? (
+                    {spendingDisplayState === 'disconnected' && (
                         <p className="mt-4 text-sm text-neutral-600 dark:text-neutral-300">
                             支出データはまだ接続されていません
                         </p>
-                    ) : !hasValidDataShape || !hasValidTotal ? (
+                    )}
+                    {spendingDisplayState === 'invalid' && (
                         <p role="status" className="mt-4 text-sm text-neutral-600 dark:text-neutral-300">
                             対象月・カテゴリ別金額のデータ形式、または金額の上限を確認してください
                         </p>
-                    ) : categories.length > 0 ? (
+                    )}
+                    {spendingDisplayState === 'ready' && (
                         <>
                             <p className="mt-3 text-sm font-semibold tabular-nums">
                                 合計 ¥{formatAmount(totalSpending)}
@@ -248,7 +266,8 @@ export default function Report({ report, showDemo = false }) {
                                 割合は小数1桁に丸めています。合計が100%にならない場合があります。面積は丸め前の割合です。0円以下・不正な金額は集計対象外です。
                             </p>
                         </>
-                    ) : (
+                    )}
+                    {spendingDisplayState === 'empty' && (
                         <p className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">
                             この月の支出はありません
                         </p>
