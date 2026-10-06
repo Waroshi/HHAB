@@ -19,6 +19,7 @@ function MenuRow({
     label,
     href,
     disabled = false,
+    disabledLabel = '検討中',
     onNavigateSuccess,
     onNavigateStart,
 }) {
@@ -35,7 +36,7 @@ function MenuRow({
             </span>
             {disabled ? (
                 <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-1 text-[10px] font-bold text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                    検討中
+                    {disabledLabel}
                 </span>
             ) : (
                 <ChevronRightIcon
@@ -74,14 +75,18 @@ function MenuRow({
 export default function MenuContent({ onNavigateSuccess, onNavigateStart }) {
     const user = usePage().props.auth?.user;
     const { theme, setTheme } = useContext(MenuThemeContext);
+    // Route名だけで認証済みとは判断しない。未定義のURLも生成しない。
+    const canOpenProfile = Boolean(user) && route().has('profile.edit');
+    const canLogout = Boolean(user) && route().has('logout');
+    const unavailableLabel = user ? '未接続' : 'ログインが必要';
     const userName =
         typeof user?.name === 'string' && user.name.trim()
             ? user.name
-            : 'ユーザー';
+            : user ? 'ユーザー' : '未ログイン';
     const userEmail =
         typeof user?.email === 'string' && user.email.trim()
             ? user.email
-            : 'メール未設定';
+            : user ? 'メール未設定' : 'ログイン後にアカウント情報を表示します';
     const userInitial = userName.slice(0, 1);
 
     return (
@@ -111,7 +116,9 @@ export default function MenuContent({ onNavigateSuccess, onNavigateStart }) {
                 <MenuRow
                     icon={UserIcon}
                     label="プロフィール・アカウント設定"
-                    href={route('profile.edit')}
+                    href={canOpenProfile ? route('profile.edit') : undefined}
+                    disabled={!canOpenProfile}
+                    disabledLabel={unavailableLabel}
                     onNavigateSuccess={onNavigateSuccess}
                     onNavigateStart={onNavigateStart}
                 />
@@ -160,19 +167,33 @@ export default function MenuContent({ onNavigateSuccess, onNavigateStart }) {
                 <MenuRow icon={DocumentIcon} label="利用規約" disabled />
             </section>
 
-            <Link
-                href={route('logout')}
-                onStart={onNavigateStart}
-                onSuccess={onNavigateSuccess}
-                method="post"
-                as="button"
-                className="mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-expense/20 bg-white px-4 py-3.5 text-expense transition hover:bg-expense/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-expense focus-visible:ring-offset-2 active:bg-expense/10 dark:border-expense/40 dark:bg-neutral-900 dark:hover:bg-expense/10 dark:focus-visible:ring-offset-neutral-950 dark:active:bg-expense/15"
-            >
-                <span aria-hidden="true">
-                    <LogoutIcon size={18} />
-                </span>
-                <span className="text-sm font-bold">ログアウト</span>
-            </Link>
+            {canLogout ? (
+                <Link
+                    href={route('logout')}
+                    onStart={onNavigateStart}
+                    onSuccess={onNavigateSuccess}
+                    method="post"
+                    as="button"
+                    className="mt-6 flex min-h-14 w-full items-center justify-center gap-3 rounded-2xl border border-expense/20 bg-white px-4 py-3.5 text-expense transition hover:bg-expense/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-expense focus-visible:ring-offset-2 active:bg-expense/10 dark:border-expense/40 dark:bg-neutral-900 dark:hover:bg-expense/10 dark:focus-visible:ring-offset-neutral-950 dark:active:bg-expense/15"
+                >
+                    <span aria-hidden="true">
+                        <LogoutIcon size={18} />
+                    </span>
+                    <span className="text-sm font-bold">ログアウト</span>
+                </Link>
+            ) : (
+                <button
+                    type="button"
+                    disabled
+                    className="mt-6 flex min-h-14 w-full cursor-not-allowed items-center justify-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3.5 text-neutral-500 opacity-60 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400"
+                >
+                    <span aria-hidden="true">
+                        <LogoutIcon size={18} />
+                    </span>
+                    <span className="text-sm font-bold">ログアウト</span>
+                    <span className="text-xs">{unavailableLabel}</span>
+                </button>
+            )}
         </>
     );
 }

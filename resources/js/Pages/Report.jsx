@@ -167,14 +167,22 @@ export default function Report({ report, showDemo = false }) {
         spendingDescription = '支出内訳は未接続です。対象月とカテゴリ別の支出データを受け取ると表示します。';
     }
 
-    const reportAdvice = report?.advice ?? {};
-    const increasedAmount = Number(reportAdvice.increasedAmount);
-    const formattedIncreasedAmount = Math.max(
-        0,
-        Number.isFinite(increasedAmount)
-            ? increasedAmount
-            : demoReport.advice.increasedAmount,
-    ).toLocaleString('ja-JP');
+    // 支出0件でも、届いたアドバイスは表示する。デモは支出内訳と同じ条件で選ぶ。
+    const reportAdvice = spendingReport?.advice;
+    const adviceMessage = typeof reportAdvice?.message === 'string'
+        ? reportAdvice.message.trim() : '';
+    const savingSuggestion = typeof reportAdvice?.savingSuggestion === 'string'
+        ? reportAdvice.savingSuggestion.trim() : '';
+    const rawIncreasedAmount = reportAdvice?.increasedAmount;
+    const isNumericAdviceAmount = typeof rawIncreasedAmount === 'number'
+        || (typeof rawIncreasedAmount === 'string'
+            && /^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(rawIncreasedAmount.trim()));
+    const increasedAmount = Number(rawIncreasedAmount);
+    // null・空文字は未接続として扱い、正しい0円とは区別する。
+    const hasIncreasedAmount = isNumericAdviceAmount
+        && Number.isFinite(increasedAmount) && increasedAmount >= 0;
+    const hasAdvice = Boolean(adviceMessage || savingSuggestion || hasIncreasedAmount);
+    const hasCompleteAdvice = Boolean(adviceMessage && savingSuggestion && hasIncreasedAmount);
 
     return (
         <AuthenticatedLayout>
@@ -278,16 +286,34 @@ export default function Report({ report, showDemo = false }) {
                     <h2 className="text-base font-bold text-amber-700 dark:text-amber-300">
                         節約アドバイス
                     </h2>
-                    <p className="mt-3 text-sm font-medium">
-                        {reportAdvice.message ?? demoReport.advice.message}
-                    </p>
-                    <p className="mt-2 text-2xl font-bold text-amber-700 tabular-nums dark:text-amber-300">
-                        +¥{formattedIncreasedAmount}
-                    </p>
-                    <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                        {reportAdvice.savingSuggestion ??
-                            demoReport.advice.savingSuggestion}
-                    </p>
+                    {isDemo && (
+                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
+                            デモ表示：確認用の節約アドバイスです
+                        </p>
+                    )}
+                    {!hasAdvice && (
+                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
+                            節約アドバイスはまだ接続されていません
+                        </p>
+                    )}
+                    {hasAdvice && !hasCompleteAdvice && (
+                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
+                            一部のアドバイス項目は未接続です
+                        </p>
+                    )}
+                    {adviceMessage && (
+                        <p className="mt-3 text-sm font-medium">{adviceMessage}</p>
+                    )}
+                    {hasIncreasedAmount && (
+                        <p className="mt-2 text-2xl font-bold text-amber-700 tabular-nums dark:text-amber-300">
+                            +¥{increasedAmount.toLocaleString('ja-JP')}
+                        </p>
+                    )}
+                    {savingSuggestion && (
+                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
+                            {savingSuggestion}
+                        </p>
+                    )}
                 </Card>
             </div>
         </AuthenticatedLayout>

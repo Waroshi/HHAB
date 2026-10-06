@@ -11,7 +11,6 @@ import { Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const hasMenuRoute = route().has('menu.index');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const themeSettings = useTheme();
 
@@ -38,32 +37,30 @@ export default function AuthenticatedLayout({ header, children }) {
                             HHAB
                         </Link>
 
-                        {hasMenuRoute && (
-                            <button
-                                type="button"
-                                onClick={() => setIsMenuOpen(true)}
-                                aria-label="メニューを開く"
-                                aria-expanded={isMenuOpen}
-                                aria-controls={isMenuOpen ? 'side-menu' : undefined}
-                                aria-haspopup="dialog"
-                                className="inline-flex size-11 items-center justify-center rounded-md text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-950"
+                        <button
+                            type="button"
+                            onClick={() => setIsMenuOpen(true)}
+                            aria-label="メニューを開く"
+                            aria-expanded={isMenuOpen}
+                            aria-controls={isMenuOpen ? 'side-menu' : undefined}
+                            aria-haspopup="dialog"
+                            className="inline-flex size-11 items-center justify-center rounded-md text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-950"
+                        >
+                            <svg
+                                aria-hidden="true"
+                                className="size-6"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
                             >
-                                <svg
-                                    aria-hidden="true"
-                                    className="size-6"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                    />
-                                </svg>
-                            </button>
-                        )}
+                                <path
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                />
+                            </svg>
+                        </button>
                     </div>
                 </header>
 
