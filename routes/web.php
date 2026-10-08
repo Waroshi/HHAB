@@ -1,9 +1,5 @@
 <?php
 
-// routes/web.php
-// Defines the browser routes for the Inertia web app.
-// Exists to connect URLs to Laravel controllers and React pages.
-// RELATED FILES: resources/js/Pages/Dashboard.jsx, resources/js/Layouts/AuthenticatedLayout.jsx, routes/auth.php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
@@ -26,6 +22,18 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
+
+Route::get('/readings', function () {
+    return Inertia::render('Readings');
+})->name('readings.index');
+
+Route::get('/calendar', function () {
+    return Inertia::render('Calendar/Index');
+})->name('calendar.index');
+
+Route::get('/reports', function () {
+    return Inertia::render('Reports/Index');
+})->name('reports.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
