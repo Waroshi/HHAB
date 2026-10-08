@@ -27,11 +27,15 @@ export default function ReadingResult() {
     const [isEditing, setIsEditing] = useState(false);
     const [receipt, setReceipt] = useState(demoReceipt);
 
+    // 現在の読み取り結果をコピーし、指定された項目だけを書き換える。
+    // 元の state は直接変更せず、新しいオブジェクトを React に渡す。
     const updateReceipt = (field, value) => {
-        setReceipt((currentReceipt) => ({
-            ...currentReceipt,
-            [field]: value,
-        }));
+        setReceipt((currentReceipt) => {
+            const nextReceipt = { ...currentReceipt };
+            nextReceipt[field] = value;
+
+            return nextReceipt;
+        });
     };
 
     const submit = (event) => {
