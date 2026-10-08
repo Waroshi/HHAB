@@ -1,9 +1,4 @@
-// ============================================================
-// 貼り付け先: resources/js/Pages/Scan.jsx（新規作成）
-// 役割: レシート撮影画面。
-//       <input type="file" capture="environment"> でスマホの背面カメラを起動し、
-//       撮影した画像をプレビューし、読み取り結果画面へ進む。
-// ============================================================
+// レシート画像を撮影・選択する画面。カメラを使えるかは端末に依存する。
 import { useEffect, useRef, useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { BackIcon } from '../Components/Icons';
@@ -24,6 +19,7 @@ export default function Scan() {
     const [previewImageUrl, setPreviewImageUrl] = useState(null);
     const [isReading, setIsReading] = useState(false);
 
+    // 次のEffect実行前と画面終了時に、前回のObject URLを解放してメモリに残さない。
     useEffect(() => {
         if (!previewImageUrl) {
             return undefined;
@@ -34,8 +30,7 @@ export default function Scan() {
         };
     }, [previewImageUrl]);
 
-    // ファイル選択（＝カメラ撮影）が完了したときの処理。
-    // プレビューを表示しつつ、読み取り結果画面へ進む。
+    // 選んだ画像はプレビュー用。ここでは画像を送信・解析せず、結果画面へ移動する。
     const handleReceiptSelected = (changeEvent) => {
         const selectedFile = changeEvent.target.files?.[0];
         if (!selectedFile) {
@@ -66,7 +61,7 @@ export default function Scan() {
     }
 
     return (
-        // カメラ画面だけは常に暗い背景にしたいので AppLayout を使わない
+        // 撮影画面は常に暗い背景と独自のヘッダーを使うため、共通レイアウトで囲まない。
         <div className="mx-auto flex min-h-dvh max-w-md flex-col overflow-x-hidden bg-neutral-950 text-neutral-100">
             <Head title="レシートを読む" />
 
