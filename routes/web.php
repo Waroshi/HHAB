@@ -4,6 +4,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReceiptsScanController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +24,11 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
+
+Route::post('/expenses', [
+    ExpenseController::class,
+    'store',
+])->name('expenses.store');
 
 // ローカルだけで使う画面確認用ルート。DBへの保存やレシートの実解析は行わない。
 if (app()->environment('local')) {
