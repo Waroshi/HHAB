@@ -11,7 +11,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $expenses = Expense::with('Category')
+        $expenses = Expense::with('category')
             ->latest('spent_at')
             ->get();
 
@@ -23,7 +23,7 @@ class DashboardController extends Controller
                 'period' => now()->format('n月の集計'),
                 'usedRatePercent' => 0,
                 'remainingBudget' => 0,
-                'dailybudget' => 0,
+                'dailyBudget' => 0,
                 'adviceMessage' => null,
                 'recentTransactions' => $expenses
                     ->take(5)
@@ -31,8 +31,8 @@ class DashboardController extends Controller
                         return [
                             'id' => $expense->id,
                             'date' => $expense->spent_at,
-                            'store' => $expense->store_name ??
-                            'category' => $expense->category?->name ??
+                            'store' => $expense->store_name ?? '店舗名なし',
+                            'category' => $expense->category?->name ?? 'その他',
                             'method' => null,
                             'type' => 'expense',
                             'amount' => $expense->amount,
@@ -52,7 +52,7 @@ class DashboardController extends Controller
             ])
             ->get();
 
-        $dailySpendings = $expenses
+        $dailySpending = $expenses
             ->groupBy(function ($expense) {
                 return $expense->spent_at->day;
             })
@@ -63,9 +63,9 @@ class DashboardController extends Controller
         return Inertia::render('Calendar', [
             'year' => now()->year,
             'month' => now()->month,
-            'dailySpendings' => $dailySpendings,
+            'dailySpending' => $dailySpending,
             'monthlyTotal' => $expenses->sum('amount'),
-            'highSpendingDayCount' => $dailySpendings
+            'highSpendingDayCount' => $dailySpending
                 ->filter(fn ($amount) => $amount > 0)
                 ->count(),
             'paydayLabel' => null,
