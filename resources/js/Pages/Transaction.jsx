@@ -1,29 +1,11 @@
 // resources/js/Pages/Transaction.jsx
 // Shows the mobile transaction list screen.
 // Exists so users can search and filter income and expense transactions.
-// RELATED FILES: app/Http/Controllers/TransactionController.php, routes/web.php
+// RELATED FILES: app/Http/Controllers/TransactionController.php, resources/js/Components/BottomNavbar.jsx, routes/web.php
 
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import BottomNavbar from '@/Components/BottomNavbar';
 import { Head, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-
-// 取引を表示順のまま日付別にまとめる。
-// 同じ日付が初めて現れたときだけ、その日の配列を用意する。
-function groupTransactionsByDate(transactions) {
-    const groupedTransactions = {};
-
-    for (const transaction of transactions) {
-        const date = formatDate(transaction.date);
-
-        if (!groupedTransactions[date]) {
-            groupedTransactions[date] = [];
-        }
-
-        groupedTransactions[date].push(transaction);
-    }
-
-    return groupedTransactions;
-}
 
 export default function Transaction({
     transactions = [],
@@ -32,10 +14,19 @@ export default function Transaction({
 }) {
     const [search, setSearch] = useState(filters.search ?? '');
 
-    const groupedTransactions = useMemo(
-        () => groupTransactionsByDate(transactions),
-        [transactions],
-    );
+    const groupedTransactions = useMemo(() => {
+        return transactions.reduce((groups, transaction) => {
+            const date = formatDate(transaction.date);
+
+            if (!groups[date]) {
+                groups[date] = [];
+            }
+
+            groups[date].push(transaction);
+
+            return groups;
+        }, {});
+    }, [transactions]);
 
     const applyFilters = (nextFilters) => {
         router.get(
@@ -58,12 +49,12 @@ export default function Transaction({
     };
 
     return (
-        <AuthenticatedLayout>
+        <main className="min-h-screen bg-white px-5 pb-24 pt-8">
             <Head title="取引一覧" />
 
-            <div className="mx-auto max-w-md px-5 pb-8 pt-8 text-neutral-900 dark:text-neutral-100">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-neutral-100">取引一覧</h1>
-                <p className="mt-2 text-sm font-semibold text-gray-400 dark:text-neutral-400">
+            <section className="mx-auto max-w-md">
+                <h1 className="text-3xl font-bold text-gray-900">取引一覧</h1>
+                <p className="mt-2 text-sm font-semibold text-gray-400">
                     {currentMonth}
                 </p>
 
@@ -73,7 +64,7 @@ export default function Transaction({
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="店舗名・金額で検索"
-                        className="w-full rounded-full border-0 bg-white px-6 py-4 text-sm font-semibold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#50C868] dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder-neutral-400"
+                        className="w-full rounded-full border-0 bg-gray-100 px-6 py-4 text-sm font-semibold text-gray-700 placeholder:text-gray-300 focus:ring-2 focus:ring-[#50C868]"
                     />
                 </form>
 
@@ -104,7 +95,7 @@ export default function Transaction({
                 <div className="mt-8 space-y-8">
                     {Object.entries(groupedTransactions).map(([date, items]) => (
                         <section key={date}>
-                            <h2 className="text-base font-bold text-gray-400 dark:text-neutral-400">
+                            <h2 className="text-base font-bold text-gray-400">
                                 {date}
                             </h2>
 
@@ -119,8 +110,10 @@ export default function Transaction({
                         </section>
                     ))}
                 </div>
-            </div>
-        </AuthenticatedLayout>
+            </section>
+
+            {/* <BottomNavbar /> */}
+        </main>
     );
 }
 
@@ -152,7 +145,7 @@ function TransactionCard({ transaction }) {
     const isIncome = transaction.type === 'income';
 
     return (
-        <article className="flex items-center rounded-3xl border border-gray-100 bg-white px-6 py-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none">
+        <article className="flex items-center rounded-3xl border border-gray-100 bg-white px-6 py-5 shadow-sm">
             <div
                 className={`h-10 w-10 rounded-full ${
                     isIncome ? 'bg-purple-100' : 'bg-emerald-50'
@@ -160,17 +153,17 @@ function TransactionCard({ transaction }) {
             />
 
             <div className="ml-5 min-w-0 flex-1">
-                <h3 className="truncate text-base font-bold text-gray-900 dark:text-neutral-100">
+                <h3 className="truncate text-base font-bold text-gray-900">
                     {transaction.title}
                 </h3>
-                <p className="mt-1 text-sm font-semibold text-gray-400 dark:text-neutral-400">
+                <p className="mt-1 text-sm font-semibold text-gray-400">
                     {transaction.category}
                 </p>
             </div>
 
             <p
                 className={`ml-4 text-base font-extrabold ${
-                    isIncome ? 'text-blue-400 dark:text-blue-300' : 'text-pink-400 dark:text-pink-300'
+                    isIncome ? 'text-blue-400' : 'text-pink-400'
                 }`}
             >
                 {isIncome ? '+' : '-'}¥{Number(transaction.amount).toLocaleString()}
