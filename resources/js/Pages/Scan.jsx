@@ -73,10 +73,13 @@ export default function Scan() {
     useEffect(() => {
         if (isManualEntry !== previousModeRef.current) {
             if (isManualEntry) {
-                manualEntryButtonRef.current?.focus();
+                manualEntryButtonRef.current?.focus({ preventScroll: true });
             } else {
-                receiptMethodRef.current?.focus();
+                receiptMethodRef.current?.focus({ preventScroll: true });
             }
+        }
+        if (isManualEntry !== previousModeRef.current) {
+            window.scrollTo({ top: 0, behavior: 'instant' });
         }
         previousModeRef.current = isManualEntry;
     }, [isManualEntry]);
@@ -144,27 +147,17 @@ export default function Scan() {
         guideMessage = '読み取り中…';
     }
 
-    const methodButtonClass = 'min-h-14 flex-1 rounded-lg border-2 px-2 py-2 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40';
-    let selectedMethodClass = 'border-brand-400 bg-brand-800/40 text-white';
-    let otherMethodClass = 'border-transparent text-neutral-300 hover:bg-neutral-800';
-    let methodGroupClass = 'border-neutral-700 bg-neutral-900';
-    if (isManualEntry) {
-        selectedMethodClass = 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-800/30 dark:text-brand-200';
-        otherMethodClass = 'border-transparent text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800';
-        methodGroupClass = 'border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900';
-    }
-
     const inputMethodSwitch = (
-        <div role="group" aria-label="入力方法" className={`mt-4 flex gap-2 rounded-xl border p-1.5 ${methodGroupClass}`}>
+        <div role="group" aria-label="入力方法" className="mt-4 flex gap-1 rounded-[14px] border-0 border-current bg-[#dce3de] p-1 dark:bg-[#35473b]">
             <button
                 ref={receiptMethodRef}
                 type="button"
                 aria-pressed={!isManualEntry}
                 disabled={isReading}
                 onClick={() => setIsManualEntry(false)}
-                className={`${methodButtonClass} ${isManualEntry ? otherMethodClass : selectedMethodClass}`}
+                className="min-h-[52px] flex-1 rounded-[10px] border-0 bg-transparent px-2 py-2 text-sm font-bold text-[#526158] dark:text-[#b3c0b7] aria-pressed:bg-white aria-pressed:text-brand-700 aria-pressed:shadow-[0_1px_4px_#0000000d] hover:!text-[#202923] dark:aria-pressed:bg-[#19201c] dark:aria-pressed:text-brand-200 dark:hover:!text-[#eef4f0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
             >
-                レシート
+                {!isManualEntry && <span aria-hidden="true">✓ </span>}レシート
                 <span className="mt-0.5 block text-xs font-medium">{isManualEntry ? '撮影・画像選択' : '選択中'}</span>
             </button>
             <button
@@ -173,92 +166,97 @@ export default function Scan() {
                 aria-pressed={isManualEntry}
                 disabled={isReading}
                 onClick={() => setIsManualEntry(true)}
-                className={`${methodButtonClass} ${isManualEntry ? selectedMethodClass : otherMethodClass}`}
+                className="min-h-[52px] flex-1 rounded-[10px] border-0 bg-transparent px-2 py-2 text-sm font-bold text-[#526158] dark:text-[#b3c0b7] aria-pressed:bg-white aria-pressed:text-brand-700 aria-pressed:shadow-[0_1px_4px_#0000000d] hover:!text-[#202923] dark:aria-pressed:bg-[#19201c] dark:aria-pressed:text-brand-200 dark:hover:!text-[#eef4f0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
             >
-                手入力
+                {isManualEntry && <span aria-hidden="true">✓ </span>}手入力
                 <span className="mt-0.5 block text-xs font-medium">{isManualEntry ? '選択中' : '画像なしで入力'}</span>
             </button>
         </div>
     );
 
-    if (isManualEntry) {
-        return (
-            <div className="relative mx-auto min-h-dvh max-w-md bg-gray-100 px-4 pt-5 pb-[calc(env(safe-area-inset-bottom)+2rem)] text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 sm:px-5">
-                <Head title="支出を手入力" />
-                <header>
-                    <button
-                        type="button"
-                        onClick={() => setIsManualEntry(false)}
-                        aria-label="レシート画面に戻る"
-                        className="absolute left-4 top-4 inline-flex size-11 items-center justify-center rounded-full bg-neutral-200 text-neutral-900 transition hover:bg-neutral-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100 active:bg-neutral-300 dark:bg-white/10 dark:text-neutral-100 dark:hover:bg-white/15 dark:focus-visible:ring-brand-400 dark:focus-visible:ring-offset-neutral-950 dark:active:bg-white/20"
-                    >
-                        <span aria-hidden="true">
-                            <BackIcon size={20} />
-                        </span>
-                    </button>
-                    <div className="min-h-11 pl-12">
-                        <h1 className="text-2xl font-bold">支出を手入力</h1>
-                        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">画像なしで、支出の内容を入力できます。</p>
-                    </div>
-                    {inputMethodSwitch}
-                </header>
-                <main>
-                    <aside className="mt-4 rounded-xl border border-neutral-200 bg-white px-3 py-2.5 text-xs leading-relaxed text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-                        <p><strong>保存機能は未接続です。</strong>再読み込み・別画面への移動で入力が消えます。</p>
-                        <p>レシート／手入力の切り替えでは入力を保持します。</p>
-                    </aside>
-                    <form noValidate onSubmit={checkManualExpense} className="mt-4 space-y-4">
-                        <ExpenseForm
-                            values={manualExpense}
-                            onChange={updateManualExpense}
-                            isEditing={true}
-                            isManual={true}
-                            errors={errors}
-                            storeLabel="店舗名・購入先"
-                            basicHeading={<h2 className="text-base font-bold">支出の基本情報</h2>}
-                            otherHeading={<h2 className="text-base font-bold">カテゴリ・その他</h2>}
-                        />
-                        <p role="status" className="text-sm text-neutral-700 dark:text-neutral-300">{checkMessage}</p>
-                        <button
-                            type="submit"
-                            className="min-h-12 w-full rounded-xl bg-brand-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-100 active:bg-brand-800 disabled:cursor-not-allowed disabled:bg-brand-600 disabled:opacity-40 dark:bg-brand-500 dark:hover:bg-brand-600 dark:focus-visible:ring-brand-300 dark:focus-visible:ring-offset-neutral-950 dark:active:bg-brand-700 dark:disabled:bg-brand-500"
-                        >
-                            入力内容を確認する
-                        </button>
-                    </form>
-                </main>
-            </div>
-        );
-    }
-
-    return (
-        // 撮影画面は常に暗い背景と独自のヘッダーを使うため、共通レイアウトで囲まない。
-        <div className="mx-auto flex min-h-dvh max-w-md flex-col overflow-x-hidden bg-neutral-950 text-neutral-100">
-            <Head title="レシートを読む" />
-
-            <header className="relative px-4 pb-4 pt-5 sm:px-5">
+    // 入力方法を切り替えても見出しと位置を揃える。
+    const entryHeader = (
+        <header className="flex items-start gap-4 max-[374px]:gap-3">
+            {isManualEntry ? (
+                <button
+                    type="button"
+                    onClick={() => setIsManualEntry(false)}
+                    aria-label="レシート画面に戻る"
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-[#dce3de] dark:border-[#35473b] bg-white dark:bg-[#19201c] text-[#202923] dark:text-[#eef4f0] hover:bg-brand-50 dark:hover:bg-[#24392d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
+                >
+                    <span aria-hidden="true">
+                        <BackIcon size={20} />
+                    </span>
+                </button>
+            ) : (
                 <Link
                     href={route('dashboard')}
                     aria-label="戻る"
-                    className="absolute left-4 top-4 inline-flex size-11 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 active:bg-white/20"
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-[#dce3de] dark:border-[#35473b] bg-white dark:bg-[#19201c] text-[#202923] dark:text-[#eef4f0] hover:bg-brand-50 dark:hover:bg-[#24392d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
                 >
                     <span aria-hidden="true">
                         <BackIcon size={20} />
                     </span>
                 </Link>
+            )}
+            <div>
+                <p className="text-[11px] font-semibold tracking-[0.08em] text-[#526158] dark:text-[#b3c0b7]">HHAB / 支出の入力</p>
+                <h1 className="mt-1 text-[22px] font-bold leading-[1.4] tracking-tight">支出を入力</h1>
+                <p className="mt-1.5 text-sm leading-[1.5] text-[#526158] dark:text-[#b3c0b7]">レシート撮影、または手入力で。</p>
+            </div>
+        </header>
+    );
 
-                <div className="px-12 text-center">
-                    <h1 className="text-xl font-bold tracking-tight">
-                        レシートを読む
-                    </h1>
-                    <p className="mt-2 text-sm leading-relaxed text-neutral-400">
-                        レシート全体が写るように撮影してください
-                    </p>
+    if (isManualEntry) {
+        return (
+            <div className="min-h-dvh bg-gray-100 pt-5 pb-[calc(env(safe-area-inset-bottom)+32px)] text-[#202923] dark:text-[#eef4f0] [color-scheme:light] dark:bg-[#0f1411] dark:[color-scheme:dark]">
+                <Head title="支出を手入力" />
+                <div className="mx-auto max-w-md px-5 max-[374px]:px-4">
+                    {entryHeader}
+                    {inputMethodSwitch}
+                    <main>
+                        <aside className="mx-0.5 my-[18px] flex gap-2.5 text-xs leading-[1.8] text-[#526158] dark:text-[#b3c0b7]">
+                            <span aria-hidden="true" className="mt-0.5 inline-flex size-[18px] shrink-0 items-center justify-center rounded-full border border-current font-serif font-bold">i</span>
+                            <div>
+                                <p><strong className="font-semibold text-[#202923] dark:text-[#eef4f0]">入力内容はまだ保存されません</strong></p>
+                                <p>再読み込み・別画面への移動で消えます。入力方法の切り替えでは保持されます。</p>
+                            </div>
+                        </aside>
+                        <form noValidate onSubmit={checkManualExpense} className="overflow-hidden rounded-[20px] border border-[#dce3de] dark:border-[#35473b] bg-white dark:bg-[#19201c] shadow-[0_6px_24px_#16352305]">
+                            <ExpenseForm
+                                values={manualExpense}
+                                onChange={updateManualExpense}
+                                isEditing={true}
+                                isManual={true}
+                                errors={errors}
+                                storeLabel="店舗名・購入先"
+                                basicHeading={<h2 className="text-sm font-bold leading-6">支出の基本情報</h2>}
+                                otherHeading={<h2 className="text-sm font-bold leading-6">分類とメモ</h2>}
+                            />
+                            <div className="border-t p-5 border-[#dce3de] dark:border-[#35473b]">
+                            <p role="status" className="mb-4 text-[13px] leading-[1.8] empty:m-0 text-[#202923] dark:text-[#eef4f0]">{checkMessage}</p>
+                            <button
+                                type="submit"
+                                className="min-h-12 w-full rounded-[10px] bg-brand-700 text-sm leading-[1.5] font-bold text-white hover:bg-brand-800 dark:bg-brand-200 dark:text-[#19201c] dark:hover:bg-[#c4ecd7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
+                            >
+                                入力内容を確認する
+                            </button>
+                            <p className="mt-3 text-center text-[11px] leading-[1.7] text-[#526158] dark:text-[#b3c0b7]">内容の確認のみ行います。保存はされません。</p>
+                            </div>
+                        </form>
+                    </main>
                 </div>
-                {inputMethodSwitch}
-            </header>
+            </div>
+        );
+    }
 
-            <main className="flex flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] sm:px-6">
+    return (
+        <div className="min-h-dvh bg-gray-100 pt-5 pb-[calc(env(safe-area-inset-bottom)+32px)] text-[#202923] dark:text-[#eef4f0] [color-scheme:light] dark:bg-[#0f1411] dark:[color-scheme:dark]">
+            <Head title="レシートを読む" />
+            <div className="mx-auto max-w-md px-5 max-[374px]:px-4">
+                {entryHeader}
+                {inputMethodSwitch}
+            <main className="mt-5">
                 {/* ---------- 撮影・プレビュー領域 ---------- */}
                 <section
                     aria-label="レシート撮影プレビュー"
@@ -328,7 +326,7 @@ export default function Scan() {
                         aria-label="撮影する"
                         disabled={isReading}
                         onClick={openCamera}
-                        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 active:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="min-h-12 w-full rounded-[10px] bg-brand-700 text-sm leading-[1.5] font-bold text-white hover:bg-brand-800 dark:bg-brand-200 dark:text-[#19201c] dark:hover:bg-[#c4ecd7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200 flex items-center justify-center gap-2 disabled:opacity-40"
                     >
                         <svg
                             aria-hidden="true"
@@ -347,17 +345,18 @@ export default function Scan() {
 
                 <p
                     aria-live="polite"
-                    className="mt-3 min-h-5 text-center text-sm font-medium text-neutral-300"
+                    className="mt-3 min-h-5 text-center text-[13px] text-[#202923] dark:text-[#eef4f0]"
                 >
                     {guideMessage}
                 </p>
 
-                <aside className="mt-4 rounded-xl border border-neutral-800 bg-neutral-900/70 px-4 py-3">
-                    <p className="text-xs leading-relaxed text-neutral-400">
+                <aside className="mt-4 py-3 text-[#526158] dark:text-[#b3c0b7]">
+                    <p className="text-xs leading-relaxed">
                         明るい場所で撮影すると、レシートを確認しやすくなります。
                     </p>
                 </aside>
             </main>
+            </div>
         </div>
     );
 }
