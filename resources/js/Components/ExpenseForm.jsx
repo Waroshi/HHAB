@@ -36,7 +36,7 @@ export default function ExpenseForm({
     }
 
     const amountSection = (
-        <section className={isManual ? "p-5" : "min-w-0 rounded-2xl border border-brand-200 bg-brand-50 p-4 shadow-sm dark:border-brand-800 dark:bg-brand-800/20"}>
+        <section className={isManual ? "p-4" : "min-w-0 rounded-2xl border border-brand-200 bg-brand-50 p-4 shadow-sm dark:border-brand-800 dark:bg-brand-800/20"}>
             <InputLabel
                 htmlFor="totalAmount"
                 value={fieldLabel('合計金額', true)}
@@ -78,10 +78,10 @@ export default function ExpenseForm({
     return (
         <>
             {isManual && amountSection}
-            <section className={isManual ? "border-t p-5 border-[#dce3de] dark:border-[#35473b]" : "min-w-0 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"}>
+            <section className={isManual ? "border-t p-4 border-[#dce3de] dark:border-[#35473b]" : "min-w-0 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"}>
                 {basicHeading}
 
-                <div className={isManual ? "mt-4 grid gap-4" : "mt-4 space-y-4"}>
+                <div className={isManual ? "mt-3 grid gap-3" : "mt-4 space-y-4"}>
                     <div className="min-w-0">
                         <InputLabel className={isManual ? manualLabelClass : undefined}
                             htmlFor="storeName"
@@ -89,6 +89,9 @@ export default function ExpenseForm({
                         />
                         <TextInput
                             id="storeName"
+                            maxLength={255}
+                            aria-invalid={Boolean(errors.storeName)}
+                            aria-describedby={errors.storeName ? 'storeName-error' : undefined}
                             placeholder={isManual ? '例：スーパー、オンラインストア' : undefined}
                             value={values.storeName}
                             onChange={(event) =>
@@ -100,6 +103,7 @@ export default function ExpenseForm({
                             readOnly={!isEditing}
                             className={isManual ? manualInputClass : "mt-1 block min-h-11 w-full min-w-0 break-words read-only:bg-neutral-100 read-only:text-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:read-only:bg-neutral-800 dark:read-only:text-neutral-300 dark:focus-visible:ring-brand-300"}
                         />
+                        {errors.storeName && <p id="storeName-error" className={manualErrorClass}>{errors.storeName}</p>}
                     </div>
 
                     <div className="min-w-0">
@@ -129,10 +133,10 @@ export default function ExpenseForm({
 
             {!isManual && amountSection}
 
-            <section className={isManual ? "border-t p-5 border-[#dce3de] dark:border-[#35473b]" : "min-w-0 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"}>
+            <section className={isManual ? "border-t p-4 border-[#dce3de] dark:border-[#35473b]" : "min-w-0 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-900"}>
                 {otherHeading}
 
-                <div className={isManual ? "mt-4 grid gap-4" : "mt-4 space-y-4"}>
+                <div className={isManual ? "mt-3 grid gap-3" : "mt-4 space-y-4"}>
                     <div className="min-w-0">
                         <InputLabel className={isManual ? manualLabelClass : undefined} htmlFor="category" value={fieldLabel('カテゴリ', true)} />
                         <select
@@ -203,6 +207,9 @@ export default function ExpenseForm({
                         <InputLabel className={isManual ? manualLabelClass : undefined} htmlFor="memo" value={fieldLabel('メモ')} />
                         <textarea
                             id="memo"
+                            maxLength={255}
+                            aria-invalid={Boolean(errors.memo)}
+                            aria-describedby={errors.memo ? 'memo-error' : undefined}
                             rows={isManual ? 3 : 4}
                             value={values.memo}
                             onChange={(event) =>
@@ -211,6 +218,7 @@ export default function ExpenseForm({
                             readOnly={!isEditing}
                             className={isManual ? manualInputClass + ' min-h-24 resize-y' : "mt-1 block min-h-28 w-full min-w-0 resize-y rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 read-only:bg-neutral-100 read-only:text-neutral-700 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-brand-400 dark:focus:ring-brand-400 dark:focus-visible:ring-brand-300 dark:read-only:bg-neutral-800 dark:read-only:text-neutral-300"}
                         />
+                        {errors.memo && <p id="memo-error" className={manualErrorClass}>{errors.memo}</p>}
                     </div>
                 </div>
             </section>

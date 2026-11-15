@@ -24,15 +24,15 @@ Route::get('/dashboard', function () {
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
 Route::get('/readings', function () {
-    return Inertia::render('Readings');
+    return Inertia::render('Scan');
 })->name('readings.index');
 
 Route::get('/calendar', function () {
-    return Inertia::render('Calendar/Index');
+    return Inertia::render('Calendar');
 })->name('calendar.index');
 
 Route::get('/reports', function () {
-    return Inertia::render('Reports/Index');
+    return Inertia::render('Report');
 })->name('reports.index');
 
 Route::middleware('auth')->group(function () {

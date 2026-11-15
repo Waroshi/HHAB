@@ -1,6 +1,6 @@
 // レシート画像を撮影・選択する画面。カメラを使えるかは端末に依存する。
 import { useEffect, useRef, useState } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { BackIcon } from '../Components/Icons';
 import ExpenseForm, { CATEGORY_OPTIONS, PAYMENT_METHOD_OPTIONS } from '@/Components/ExpenseForm';
 
@@ -34,8 +34,8 @@ function validateManualExpense(expense) {
         errors.totalAmount = '合計金額を入力してください。';
     } else if (!/^[0-9]+$/.test(amount) || Number(amount) <= 0) {
         errors.totalAmount = '金額は1円以上の半角整数で入力してください（0・負数・小数は使えません）。';
-    } else if (!Number.isSafeInteger(Number(amount))) {
-        errors.totalAmount = '金額が大きすぎます。入力内容を確認してください。';
+    } else if (Number(amount) > 2147483647) {
+        errors.totalAmount = '金額は2,147,483,647円以下で入力してください。';
     }
     if (!CATEGORY_OPTIONS.includes(expense.category)) {
         errors.category = 'カテゴリを選択してください。';
@@ -58,17 +58,17 @@ const CORNER_GUIDE_CLASSNAMES = [
 const PLACEHOLDER_LINE_WIDTHS = [84, 66, 90, 48, 72];
 
 export default function Scan() {
+    const { auth } = usePage().props;
+    const { data: manualExpense, setData, post, processing, errors: serverErrors, clearErrors } = useForm(createManualExpense());
     const fileInputRef = useRef(null);
     const [previewImageUrl, setPreviewImageUrl] = useState(null);
-    const [isReading, setIsReading] = useState(false);
     const [isManualEntry, setIsManualEntry] = useState(false);
-    const [manualExpense, setManualExpense] = useState(createManualExpense);
     const [hasChecked, setHasChecked] = useState(false);
     const [checkMessage, setCheckMessage] = useState('');
     const receiptMethodRef = useRef(null);
     const manualEntryButtonRef = useRef(null);
     const previousModeRef = useRef(false);
-    const errors = hasChecked ? validateManualExpense(manualExpense) : {};
+    const errors = { ...serverErrors, ...(hasChecked ? validateManualExpense(manualExpense) : {}) };
 
     useEffect(() => {
         if (isManualEntry !== previousModeRef.current) {
@@ -85,16 +85,14 @@ export default function Scan() {
     }, [isManualEntry]);
 
     const updateManualExpense = (field, value) => {
-        setManualExpense((currentExpense) => {
-            const nextExpense = { ...currentExpense };
-            nextExpense[field] = value;
-            return nextExpense;
-        });
+        setData(field, value);
+        clearErrors(field);
         setCheckMessage('');
     };
 
-    const checkManualExpense = (event) => {
+    const saveManualExpense = (event) => {
         event.preventDefault();
+        if (processing) return;
         setHasChecked(true);
         const nextErrors = validateManualExpense(manualExpense);
         const firstErrorField = Object.keys(nextErrors)[0];
@@ -103,7 +101,17 @@ export default function Scan() {
             event.currentTarget.elements.namedItem(firstErrorField)?.focus();
             return;
         }
-        setCheckMessage('入力内容に問題はありません。保存機能は未接続のため、まだ保存されていません。');
+        if (!auth?.user) {
+            setCheckMessage('入力内容を確認しました。保存にはログインが必要です。まだ保存されていません。');
+            return;
+        }
+        post(route('expenses.store'), {
+            preserveScroll: true,
+            onError: (receivedErrors) => {
+                setCheckMessage('保存できませんでした。入力内容を確認してください。');
+                document.getElementById(Object.keys(receivedErrors)[0])?.focus();
+            },
+        });
     };
 
     // 次のEffect実行前と画面終了時に、前回のObject URLを解放してメモリに残さない。
@@ -117,7 +125,7 @@ export default function Scan() {
         };
     }, [previewImageUrl]);
 
-    // 選んだ画像はプレビュー用。ここでは画像を送信・解析せず、結果画面へ移動する。
+    // 画像はこの画面で見ながら入力するためのもの。送信・自動解析はしない。
     const handleReceiptSelected = (changeEvent) => {
         const selectedFile = changeEvent.target.files?.[0];
         if (!selectedFile) {
@@ -126,15 +134,6 @@ export default function Scan() {
 
         const previewUrl = URL.createObjectURL(selectedFile);
         setPreviewImageUrl(previewUrl);
-
-        if (!route().has('readings.result')) {
-            return;
-        }
-
-        setIsReading(true);
-        router.visit(route('readings.result'), {
-            onFinish: () => setIsReading(false),
-        });
     };
 
     // 撮影操作から、非表示のファイル入力を発火させる
@@ -142,10 +141,7 @@ export default function Scan() {
         fileInputRef.current?.click();
     };
 
-    let guideMessage = 'レシートを枠内に合わせてください';
-    if (isReading) {
-        guideMessage = '読み取り中…';
-    }
+    const guideMessage = previewImageUrl ? '画像を確認できました。内容は手入力してください。' : 'レシートを撮影・選択できます';
 
     const inputMethodSwitch = (
         <div role="group" aria-label="入力方法" className="mt-4 flex gap-1 rounded-[14px] border-0 border-current bg-[#dce3de] p-1 dark:bg-[#35473b]">
@@ -153,7 +149,7 @@ export default function Scan() {
                 ref={receiptMethodRef}
                 type="button"
                 aria-pressed={!isManualEntry}
-                disabled={isReading}
+                disabled={processing}
                 onClick={() => setIsManualEntry(false)}
                 className="min-h-[52px] flex-1 rounded-[10px] border-0 bg-transparent px-2 py-2 text-sm font-bold text-[#526158] dark:text-[#b3c0b7] aria-pressed:bg-white aria-pressed:text-brand-700 aria-pressed:shadow-[0_1px_4px_#0000000d] hover:!text-[#202923] dark:aria-pressed:bg-[#19201c] dark:aria-pressed:text-brand-200 dark:hover:!text-[#eef4f0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
             >
@@ -164,7 +160,7 @@ export default function Scan() {
                 ref={manualEntryButtonRef}
                 type="button"
                 aria-pressed={isManualEntry}
-                disabled={isReading}
+                disabled={processing}
                 onClick={() => setIsManualEntry(true)}
                 className="min-h-[52px] flex-1 rounded-[10px] border-0 bg-transparent px-2 py-2 text-sm font-bold text-[#526158] dark:text-[#b3c0b7] aria-pressed:bg-white aria-pressed:text-brand-700 aria-pressed:shadow-[0_1px_4px_#0000000d] hover:!text-[#202923] dark:aria-pressed:bg-[#19201c] dark:aria-pressed:text-brand-200 dark:hover:!text-[#eef4f0] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
             >
@@ -215,14 +211,17 @@ export default function Scan() {
                     {entryHeader}
                     {inputMethodSwitch}
                     <main>
-                        <aside className="mx-0.5 my-[18px] flex gap-2.5 text-xs leading-[1.8] text-[#526158] dark:text-[#b3c0b7]">
+                        <aside className="mx-0.5 my-4 flex gap-2.5 text-xs leading-[1.8] text-[#526158] dark:text-[#b3c0b7]">
                             <span aria-hidden="true" className="mt-0.5 inline-flex size-[18px] shrink-0 items-center justify-center rounded-full border border-current font-serif font-bold">i</span>
                             <div>
-                                <p><strong className="font-semibold text-[#202923] dark:text-[#eef4f0]">入力内容はまだ保存されません</strong></p>
-                                <p>再読み込み・別画面への移動で消えます。入力方法の切り替えでは保持されます。</p>
+                                <p><strong className="font-semibold text-[#202923] dark:text-[#eef4f0]">{auth?.user ? '入力後に「支出を保存」を押してください' : '入力を試せます。保存にはログインが必要です'}</strong></p>
+                                <p>保存前の入力は、再読み込み・別画面への移動で消えます。入力方法の切り替えでは保持されます。</p>
+                                {!auth?.user && <p className="mt-2 flex gap-4"><Link className="underline" href={route('login')}>ログイン</Link><Link className="underline" href={route('register')}>新規登録</Link></p>}
                             </div>
                         </aside>
-                        <form noValidate onSubmit={checkManualExpense} className="overflow-hidden rounded-[20px] border border-[#dce3de] dark:border-[#35473b] bg-white dark:bg-[#19201c] shadow-[0_6px_24px_#16352305]">
+                        {previewImageUrl && <details className="mb-4 text-sm"><summary className="cursor-pointer py-2">選択した画像を見る（画像は保存されません）</summary><img src={previewImageUrl} alt="入力の参考にするレシート" className="mt-2 max-h-80 w-full object-contain" /></details>}
+                        <form noValidate onSubmit={saveManualExpense} className="overflow-hidden rounded-[20px] border border-[#dce3de] dark:border-[#35473b] bg-white dark:bg-[#19201c] shadow-[0_6px_24px_#16352305]">
+                            <fieldset disabled={processing}>
                             <ExpenseForm
                                 values={manualExpense}
                                 onChange={updateManualExpense}
@@ -233,16 +232,18 @@ export default function Scan() {
                                 basicHeading={<h2 className="text-sm font-bold leading-6">支出の基本情報</h2>}
                                 otherHeading={<h2 className="text-sm font-bold leading-6">分類とメモ</h2>}
                             />
-                            <div className="border-t p-5 border-[#dce3de] dark:border-[#35473b]">
+                            <div className="border-t p-4 border-[#dce3de] dark:border-[#35473b]">
                             <p role="status" className="mb-4 text-[13px] leading-[1.8] empty:m-0 text-[#202923] dark:text-[#eef4f0]">{checkMessage}</p>
                             <button
                                 type="submit"
+                                disabled={processing}
                                 className="min-h-12 w-full rounded-[10px] bg-brand-700 text-sm leading-[1.5] font-bold text-white hover:bg-brand-800 dark:bg-brand-200 dark:text-[#19201c] dark:hover:bg-[#c4ecd7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200"
                             >
-                                入力内容を確認する
+                                {processing ? '保存中…' : auth?.user ? '支出を保存' : '入力を試す（保存なし）'}
                             </button>
-                            <p className="mt-3 text-center text-[11px] leading-[1.7] text-[#526158] dark:text-[#b3c0b7]">内容の確認のみ行います。保存はされません。</p>
+                            <p className="mt-3 text-center text-[11px] leading-[1.7] text-[#526158] dark:text-[#b3c0b7]">{auth?.user ? '保存すると取引一覧へ移動します。' : 'ログインせずに試した入力は保存されません。'}</p>
                             </div>
+                            </fieldset>
                         </form>
                     </main>
                 </div>
@@ -260,7 +261,7 @@ export default function Scan() {
                 {/* ---------- 撮影・プレビュー領域 ---------- */}
                 <section
                     aria-label="レシート撮影プレビュー"
-                    className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-2xl border border-neutral-700 bg-neutral-900 shadow-sm"
+                    className="relative mx-auto aspect-[3/4] max-h-[min(52svh,420px)] w-full max-w-sm overflow-hidden rounded-2xl border border-neutral-700 bg-neutral-900 shadow-sm"
                 >
                     {CORNER_GUIDE_CLASSNAMES.map((cornerClassName) => (
                         <span
@@ -324,7 +325,7 @@ export default function Scan() {
                     <button
                         type="button"
                         aria-label="撮影する"
-                        disabled={isReading}
+                        disabled={processing}
                         onClick={openCamera}
                         className="min-h-12 w-full rounded-[10px] bg-brand-700 text-sm leading-[1.5] font-bold text-white hover:bg-brand-800 dark:bg-brand-200 dark:text-[#19201c] dark:hover:bg-[#c4ecd7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-brand-700 focus-visible:shadow-none focus-visible:border-brand-700 dark:focus-visible:outline-brand-200 dark:focus-visible:border-brand-200 flex items-center justify-center gap-2 disabled:opacity-40"
                     >
@@ -343,6 +344,8 @@ export default function Scan() {
                     </button>
                 </div>
 
+                {previewImageUrl && <button type="button" onClick={() => setIsManualEntry(true)} className="mt-3 min-h-11 w-full rounded-xl border border-brand-700 px-3 text-sm font-bold text-brand-700 focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-brand-200 dark:text-brand-200">画像を見ながら入力する</button>}
+
                 <p
                     aria-live="polite"
                     className="mt-3 min-h-5 text-center text-[13px] text-[#202923] dark:text-[#eef4f0]"
@@ -352,7 +355,7 @@ export default function Scan() {
 
                 <aside className="mt-4 py-3 text-[#526158] dark:text-[#b3c0b7]">
                     <p className="text-xs leading-relaxed">
-                        明るい場所で撮影すると、レシートを確認しやすくなります。
+                        画像の自動解析・保存はまだ使えません。選んだ画像を見ながら、支出を手入力できます。
                     </p>
                 </aside>
             </main>
