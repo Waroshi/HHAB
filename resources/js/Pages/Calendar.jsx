@@ -1,15 +1,8 @@
 // 日ごとの支出を色の濃淡で示し、選択した日の金額を表示する。
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
-
-// TODO: バックエンド接続後に実データへ置き換えるプロトタイプ用データ
-// デモ用の日別支出。キーは「日」、値は支出額。
-// Laravel側からは { 3: 1200, 5: 860, ... } の形で渡す想定。
-const demoDailySpending = {
-    3: 1200, 5: 860, 9: 2430, 12: 3280, 16: 540, 19: 4980, 25: 1760,
-};
+import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useMemo, useState } from 'react';
 
 const WEEKDAY_HEADERS = [
     { label: '日', colorClassName: 'text-red-400 dark:text-red-300' },
@@ -69,10 +62,11 @@ function buildCalendarCells(year, month) {
 export default function Calendar({
     year = new Date().getFullYear(),
     month = new Date().getMonth() + 1, // 1〜12
-    dailySpending = demoDailySpending,
-    monthlyTotal = 42500,
-    highSpendingDayCount = 3,
-    paydayLabel = '給料日 5/25',
+    dailySpending,
+    dailyTransactions,
+    monthlyTotal = 0,
+    recordCount = 0,
+    isGuest = false,
 }) {
     // 表示中の月が今月であれば、今日の日付を初期選択にする
     const today = new Date();
@@ -85,6 +79,10 @@ export default function Calendar({
     }
 
     const [selectedDay, setSelectedDay] = useState(initialSelectedDay);
+    useEffect(() => setSelectedDay(initialSelectedDay), [year, month]);
+    const isDisconnected = dailySpending == null;
+    const selectedRecords = dailyTransactions?.[selectedDay] ?? [];
+    const monthValue = `${year}-${String(month).padStart(2, '0')}`;
     const safeDailySpending =
         dailySpending &&
         typeof dailySpending === 'object' &&
@@ -118,12 +116,19 @@ export default function Calendar({
                         日ごとの支出を確認できます
                     </p>
                 </header>
+                <label className="mt-4 block text-sm">表示する月
+                    <input type="month" value={monthValue} min="1900-01" max="9998-12" onChange={(event) => {
+                        if (event.target.value) router.get(route('calendar.index'), { month: event.target.value }, { preserveScroll: true });
+                    }} className="mt-1 block min-h-11 w-full rounded-lg border-neutral-400 bg-white text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:[color-scheme:dark]" />
+                </label>
+                {isGuest && <p className="mt-3 text-sm"><Link href={route('login')} className="underline">ログイン</Link>すると、自分の記録を日付ごとに見返せます。</p>}
+                {isDisconnected && <p role="status" className="mt-3 text-sm">日別データを受け取れていません。</p>}
 
                 <Card
                     as="section"
                     className="mt-4 overflow-hidden border border-neutral-200 dark:border-neutral-800"
                 >
-                    <div className="flex items-end justify-between gap-4 p-4">
+                    <div className="flex items-end justify-between gap-4 px-4 py-3">
                         <div>
                             <p className="text-xs text-neutral-500 dark:text-neutral-400">
                                 対象年月
@@ -134,7 +139,7 @@ export default function Calendar({
                         </div>
                         <div className="min-w-0 text-right">
                             <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                                今月の支出
+                                記録した支出
                             </p>
                             <p
                                 className={[
@@ -142,29 +147,29 @@ export default function Calendar({
                                     'dark:text-neutral-50 sm:text-2xl',
                                 ].join(' ')}
                             >
-                                ¥{monthlyTotal.toLocaleString()}
+                                {isDisconnected || isGuest ? '—' : `¥${monthlyTotal.toLocaleString()}`}
                             </p>
                         </div>
                     </div>
                     <div
                         className={[
                             'flex items-center justify-between gap-3 border-t',
-                            'border-neutral-100 px-4 py-2.5 text-[11px]',
+                            'border-neutral-100 px-4 py-2 text-[11px]',
                             'dark:border-neutral-800',
                         ].join(' ')}
                     >
                         <p className="font-bold text-brand-600 dark:text-brand-300">
-                            多い日 {highSpendingDayCount}日
+                            {isDisconnected || isGuest ? '記録の表示待ち' : `${recordCount}件の記録`}
                         </p>
                         <p className="text-neutral-400 dark:text-neutral-400">
-                            {paydayLabel}
+                            日付を押すと明細を表示
                         </p>
                     </div>
                 </Card>
 
                 <section
                     className={[
-                        '-mx-4 mt-4 overflow-hidden rounded-2xl border',
+                        '-mx-4 mt-3 overflow-hidden rounded-2xl border',
                         'border-neutral-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]',
                         'dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-none sm:mx-0',
                     ].join(' ')}
@@ -201,8 +206,8 @@ export default function Calendar({
                                         key={cellIndex}
                                         aria-hidden="true"
                                         className={[
-                                            'min-h-16 min-w-0 bg-neutral-50/80',
-                                            'dark:bg-neutral-950/80 sm:min-h-20',
+                                            'min-h-14 min-w-0 bg-neutral-50/80',
+                                            'dark:bg-neutral-950/80 sm:min-h-16',
                                         ].join(' ')}
                                     />
                                 );
@@ -230,7 +235,7 @@ export default function Calendar({
                                 dayDescription +=
                                     `、支出${spendingAmount.toLocaleString()}円`;
                             } else {
-                                dayDescription += '、支出なし';
+                                dayDescription += isDisconnected || isGuest ? '、データ未表示' : '、記録なし';
                             }
 
                             let dayNumberClassName =
@@ -261,16 +266,16 @@ export default function Calendar({
                                     aria-pressed={isSelected}
                                     aria-label={dayDescription}
                                     className={[
-                                        'flex h-full min-h-16 min-w-0 w-full',
+                                        'flex h-full min-h-14 min-w-0 w-full',
                                         'touch-manipulation flex-col items-center',
-                                        'bg-white px-0.5 py-1.5 text-center transition',
+                                        'bg-white px-0.5 py-1 text-center transition',
                                         'hover:ring-1 hover:ring-inset hover:ring-neutral-300',
                                         'focus-visible:relative focus-visible:z-10',
                                         'focus-visible:outline-none focus-visible:ring-2',
                                         'focus-visible:ring-inset focus-visible:ring-brand-500',
                                         'active:brightness-95 dark:bg-neutral-900',
                                         'dark:hover:ring-neutral-600',
-                                        'dark:focus-visible:ring-brand-300 sm:min-h-20 sm:py-2',
+                                        'dark:focus-visible:ring-brand-300 sm:min-h-16 sm:py-2',
                                         heatmapClassName,
                                     ].join(' ')}
                                 >
@@ -288,8 +293,8 @@ export default function Calendar({
                                         <span
                                             className={[
                                                 'mt-auto max-w-full truncate whitespace-nowrap',
-                                                'text-[8px] font-bold tabular-nums text-expense',
-                                                'dark:text-red-300 sm:text-[10px]',
+                                                'text-[10px] font-bold tabular-nums text-expense',
+                                                'dark:text-red-300',
                                             ].join(' ')}
                                         >
                                             ¥{spendingAmount.toLocaleString()}
@@ -303,7 +308,7 @@ export default function Calendar({
                     <p
                         className={[
                             'flex items-center justify-between border-t border-neutral-100',
-                            'bg-white px-4 py-3 text-[11px] text-neutral-400',
+                            'bg-white px-4 py-2 text-[11px] text-neutral-400',
                             'dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400',
                         ].join(' ')}
                     >
@@ -333,7 +338,9 @@ export default function Calendar({
                     <p className="text-xs text-neutral-500 dark:text-neutral-400">
                         選択日の支出
                     </p>
-                    {selectedDay === null ? (
+                    {isGuest || isDisconnected ? (
+                        <p className="mt-2 text-sm">{isGuest ? 'ログイン後に日別の記録を表示します。' : '日別の記録は未接続です。'}</p>
+                    ) : selectedDay === null ? (
                         <p className="mt-2 text-sm font-semibold text-neutral-700 dark:text-neutral-200">
                             日付を選択してください
                         </p>
@@ -351,10 +358,19 @@ export default function Calendar({
                                 </p>
                             ) : (
                                 <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                                    支出はありません
+                                    支出の記録はありません
                                 </p>
                             )}
                         </div>
+                    )}
+                    {!isGuest && !isDisconnected && selectedDay !== null && (
+                        dailyTransactions == null ? <p className="mt-3 text-sm">日別合計のみ届いています。明細は未接続です。</p> :
+                        <ul aria-label="選択日の支出明細" className="mt-3 divide-y divide-neutral-200 dark:divide-neutral-700">
+                            {selectedRecords.map((record) => <li key={record.id} className="flex items-start justify-between gap-3 py-3 text-sm">
+                                <div className="min-w-0"><p className="text-xs text-neutral-600 dark:text-neutral-400">{record.date}</p><p className="break-words font-medium">{record.title}</p></div>
+                                <span className="shrink-0 tabular-nums">¥{Number(record.amount).toLocaleString('ja-JP')}</span>
+                            </li>)}
+                        </ul>
                     )}
                 </Card>
             </div>
