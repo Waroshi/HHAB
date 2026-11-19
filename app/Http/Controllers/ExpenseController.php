@@ -6,20 +6,21 @@ use App\Models\Expense;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class ExpenseController extends Controller
 {
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'store_name' => ['nullable', 'string', 'max:255'],
-            'purchased_at' => ['required', 'date'],
-            'total_amount' => ['required', 'integer', 'min:1'],
+            'storeName' => ['nullable', 'string', 'max:255'],
+            'purchasedAt' => ['required', 'date'],
+            'totalAmount' => ['required', 'integer', 'min:1'],
             'category' => [
                 'required',
                 'in:食費,日用品,交通費,娯楽,その他',
             ],
-            'payment_method' => [
+            'paymentMethod' => [
                 'required',
                 'in:現金,クレジットカード,電子マネー,その他',
             ],
@@ -32,7 +33,7 @@ class ExpenseController extends Controller
         ]);
 
         Expense::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth::id(),
             'store_name' => $validated['storeName'] ?? null,
             'spent_at' => $validated['purchasedAt'],
             'category_id' => $category->id,
