@@ -4,6 +4,8 @@
 // RELATED FILES: app/Http/Controllers/TransactionController.php, resources/js/Components/BottomNavbar.jsx, routes/web.php
 
 import BottomNavbar from '@/Components/BottomNavbar';
+import Card from '@/Components/Card';
+import { ChevronRightIcon, InfoIcon } from '@/Components/Icons';
 import { Head, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -111,8 +113,7 @@ export default function Transaction({
                     ))}
                 </div>
             </section>
-
-            {/* <BottomNavbar /> */}
+            <BottomNavbar />
         </main>
     );
 }
