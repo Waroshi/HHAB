@@ -18,6 +18,7 @@ class Expense extends Model
         'category_id',
         'memo',
         'amount',
+        'payment_method',
     ];
 
     public function user()
@@ -34,4 +35,8 @@ class Expense extends Model
     {
         return $this->belongsTo(Receipt::class);
     }
+
+    protected $casts = [
+        'spent_at' => 'date',
+    ];
 }

@@ -4,6 +4,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReceiptsScanController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,15 +24,21 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
 
+Route::post('/expenses', [
+    ExpenseController::class,
+    'store',
+])->name('expenses.store');
+
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
 Route::get('/readings', function () {
     return Inertia::render('Scan');
 })->name('readings.index');
 
-Route::get('/calendar', function () {
-    return Inertia::render('Calendar');
-})->name('calendar.index');
+Route::get('/calendar', [
+    DashboardController::class,
+    'calendar',
+])->name('calendar.index');
 
 Route::get('/reports', function () {
     return Inertia::render('Report');

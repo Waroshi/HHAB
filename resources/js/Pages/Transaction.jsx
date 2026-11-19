@@ -1,8 +1,3 @@
-// resources/js/Pages/Transaction.jsx
-// Shows the mobile transaction list screen.
-// Exists so users can search and filter income and expense transactions.
-// RELATED FILES: app/Http/Controllers/TransactionController.php, resources/js/Layouts/AuthenticatedLayout.jsx, routes/web.php
-
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -200,8 +195,8 @@ function FilterButton({ active, onClick, children }) {
     return (
         <button
             type="button"
-            onClick={onClick}
             aria-pressed={active}
+            onClick={onClick}
             className={`min-h-11 flex-1 rounded-full px-2 py-3 text-sm font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${active ? 'bg-brand-700 text-white dark:bg-brand-200 dark:text-neutral-950' : 'bg-white text-neutral-700 ring-1 ring-inset ring-neutral-400 dark:bg-neutral-900 dark:text-neutral-200 dark:ring-neutral-600'}`}
         >
             {children}

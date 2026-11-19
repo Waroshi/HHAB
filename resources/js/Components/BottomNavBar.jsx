@@ -1,8 +1,3 @@
-// resources/js/Components/BottomNavBar.jsx
-// Displays the bottom navigation used by authenticated app screens.
-// Exists to keep app navigation reusable across authenticated pages.
-// RELATED FILES: resources/js/Layouts/AuthenticatedLayout.jsx, resources/js/Pages/Dashboard.jsx, routes/web.php
-
 import {
     CalendarIcon,
     CameraIcon,
