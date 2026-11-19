@@ -35,13 +35,15 @@ Route::get('/readings', function () {
     return Inertia::render('Readings');
 })->name('readings.index');
 
-Route::get('/calendar', function () {
-    return Inertia::render('Calendar/Index');
-})->name('calendar.index');
+Route::get('/calendar', [
+    DashboardController::class,
+    'calendar',
+])->name('calendar.index');
 
-Route::get('/reports', function () {
-    return Inertia::render('Reports/Index');
-})->name('reports.index');
+Route::get('/reports', [
+    DashboardController::class,
+    'reports',
+])->name('reports.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
