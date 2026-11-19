@@ -1,8 +1,3 @@
-// resources/js/Components/BottomNavBar.jsx
-// Displays the bottom navigation used by authenticated app screens.
-// Exists to keep app navigation reusable across authenticated pages.
-// RELATED FILES: resources/js/Layouts/AuthenticatedLayout.jsx, resources/js/Pages/Dashboard.jsx, routes/web.php
-
 import {
     CalendarIcon,
     CameraIcon,
@@ -94,10 +89,10 @@ export default function BottomNavBar() {
                                 <span
                                     aria-hidden="true"
                                     className={[
-                                        'absolute -top-5 flex size-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-md ring-4 ring-white transition-colors group-hover:bg-brand-700 group-active:bg-brand-800 dark:bg-brand-500 dark:ring-neutral-900 dark:group-hover:bg-brand-400 dark:group-active:bg-brand-600',
+                                        'absolute -top-5 flex size-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-md ring-4 transition-colors group-hover:bg-brand-700 group-active:bg-brand-800 dark:bg-brand-500 dark:group-hover:bg-brand-400 dark:group-active:bg-brand-600',
                                         isActive
-                                            ? 'ring-brand-100 dark:ring-brand-800'
-                                            : '',
+                                            ? 'ring-brand-50 dark:ring-brand-800'
+                                            : 'ring-white dark:ring-neutral-900',
                                     ].join(' ')}
                                 >
                                     <Icon size={24} />

@@ -40,10 +40,9 @@ Route::get('/calendar', [
     'calendar',
 ])->name('calendar.index');
 
-Route::get('/reports', [
-    DashboardController::class,
-    'reports',
-])->name('reports.index');
+Route::get('/reports', function () {
+    return Inertia::render('Report');
+})->name('reports.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

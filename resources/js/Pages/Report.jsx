@@ -1,6 +1,6 @@
 import Card from '@/Components/Card';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 const categoryColorClassNames = {
     food: 'bg-brand-500',
@@ -20,11 +20,6 @@ const demoReport = {
         { key: 'entertainment', name: '娯楽', amount: 1000 },
         { key: 'other', name: 'その他', amount: 1000 },
     ],
-    advice: {
-        message: '外食費が先月より増えています',
-        increasedAmount: 5600,
-        savingSuggestion: '自炊を2回増やすと約¥3,000節約',
-    },
 };
 
 // 追加カテゴリも、配列の順番ではなく変わらないkeyから色を決める。
@@ -135,9 +130,9 @@ function buildSpendingRectangles(categories, x = 0, y = 0, width = 100, height =
     ];
 }
 
-// Inertia props: report = { month: '2026-05', categories: [{ key, name, amount }], advice? }
+// Inertia props: report = { month: '2026-05', categories: [{ key, name, amount }], comparison? }
 // report未指定/nullは未接続。categories: []は受信済み0件。showDemoは明示的なデモ専用。
-export default function Report({ report, showDemo = false }) {
+export default function Report({ report, showDemo = false, isGuest = false }) {
     const isDemo = report === undefined && showDemo === true;
     const spendingReport = isDemo ? demoReport : report;
     const isDisconnected = spendingReport == null;
@@ -160,29 +155,16 @@ export default function Report({ report, showDemo = false }) {
         spendingDisplayState = 'empty';
     }
 
-    let spendingDescription = '受け取った対象月のデータから、正の支出額だけを集計しています。';
+    let spendingDescription = 'この月に記録した支出の内訳です。未記録の支出は含みません。';
     if (isDemo) {
         spendingDescription = 'デモ表示：支出内訳は2026年5月の確認用データです';
     } else if (isDisconnected) {
         spendingDescription = '支出内訳は未接続です。対象月とカテゴリ別の支出データを受け取ると表示します。';
+    } else if (isGuest) {
+        spendingDescription = 'ログインすると、自分が記録した支出の内訳を確認できます。';
     }
 
-    // 支出0件でも、届いたアドバイスは表示する。デモは支出内訳と同じ条件で選ぶ。
-    const reportAdvice = spendingReport?.advice;
-    const adviceMessage = typeof reportAdvice?.message === 'string'
-        ? reportAdvice.message.trim() : '';
-    const savingSuggestion = typeof reportAdvice?.savingSuggestion === 'string'
-        ? reportAdvice.savingSuggestion.trim() : '';
-    const rawIncreasedAmount = reportAdvice?.increasedAmount;
-    const isNumericAdviceAmount = typeof rawIncreasedAmount === 'number'
-        || (typeof rawIncreasedAmount === 'string'
-            && /^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(rawIncreasedAmount.trim()));
-    const increasedAmount = Number(rawIncreasedAmount);
-    // null・空文字は未接続として扱い、正しい0円とは区別する。
-    const hasIncreasedAmount = isNumericAdviceAmount
-        && Number.isFinite(increasedAmount) && increasedAmount >= 0;
-    const hasAdvice = Boolean(adviceMessage || savingSuggestion || hasIncreasedAmount);
-    const hasCompleteAdvice = Boolean(adviceMessage && savingSuggestion && hasIncreasedAmount);
+    const comparison = spendingReport?.comparison;
 
     return (
         <AuthenticatedLayout>
@@ -190,14 +172,20 @@ export default function Report({ report, showDemo = false }) {
 
             <div className="mx-auto max-w-md px-5 pb-8 pt-4 text-neutral-900 dark:text-neutral-100">
                 <header className="pb-3">
-                    <h1 className="text-2xl font-bold">AIアドバイス</h1>
+                    <h1 className="text-2xl font-bold">レポート</h1>
                     <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
                         {monthLabel ?? '対象月未設定'}
                     </p>
                 </header>
+                {!isDemo && /^\d{4}-\d{2}$/.test(report?.month ?? '') && <label className="mb-4 block text-sm">表示する月
+                    <input type="month" value={report.month} min="1900-01" max="9998-12" onChange={(event) => {
+                        if (event.target.value) router.get(route('reports.index'), { month: event.target.value }, { preserveScroll: true });
+                    }} className="mt-1 block min-h-11 w-full rounded-lg border-neutral-400 bg-white text-sm dark:border-neutral-600 dark:bg-neutral-900 dark:[color-scheme:dark]" />
+                </label>}
 
                 <p className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">
                     {spendingDescription}
+                    {isGuest && <Link href={route('login')} className="ml-2 underline">ログイン</Link>}
                 </p>
 
                 <Card className="p-5">
@@ -223,7 +211,7 @@ export default function Report({ report, showDemo = false }) {
                             <div
                                 role="img"
                                 aria-label={`${monthLabel}の支出内訳。四角の面積は支出割合を表します。金額と割合は下の一覧で確認できます。`}
-                                className="relative mt-4 aspect-square w-full overflow-hidden"
+                                className="relative mt-4 aspect-[6/5] w-full overflow-hidden min-[375px]:aspect-[4/3]"
                             >
                                 {rectangles.map((rectangle) => (
                                     <div
@@ -261,8 +249,8 @@ export default function Report({ report, showDemo = false }) {
                                             <span aria-hidden="true" className={`mt-1 size-3 shrink-0 rounded-sm ${category.colorClassName}`} />
                                             <span className="min-w-0 break-words font-medium">{category.name}</span>
                                         </span>
-                                        <span className="min-w-0 break-words text-right tabular-nums">
-                                            <span className="block font-semibold">¥{formatAmount(category.amount)}</span>
+                                        <span className="flex min-w-0 flex-wrap items-baseline justify-end gap-x-2 break-words text-right tabular-nums">
+                                            <span className="min-w-0 font-semibold">¥{formatAmount(category.amount)}</span>
                                             <span className="text-xs text-neutral-500 dark:text-neutral-400">
                                                 {formatPercentage(category.amount / totalSpending * 100)}
                                             </span>
@@ -277,44 +265,19 @@ export default function Report({ report, showDemo = false }) {
                     )}
                     {spendingDisplayState === 'empty' && (
                         <p className="mt-4 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-5 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">
-                            この月の支出はありません
+                            {isGuest ? 'ログイン前のため、内訳は表示していません。' : 'この月の支出の記録はありません。'}
                         </p>
                     )}
                 </Card>
 
-                <Card className="mt-4 border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/30">
+                {comparison && !isGuest && <Card className="mt-4 border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/30">
                     <h2 className="text-base font-bold text-amber-700 dark:text-amber-300">
-                        節約アドバイス
+                        記録から分かること
                     </h2>
-                    {isDemo && (
-                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                            デモ表示：確認用の節約アドバイスです
-                        </p>
-                    )}
-                    {!hasAdvice && (
-                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                            節約アドバイスはまだ接続されていません
-                        </p>
-                    )}
-                    {hasAdvice && !hasCompleteAdvice && (
-                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                            一部のアドバイス項目は未接続です
-                        </p>
-                    )}
-                    {adviceMessage && (
-                        <p className="mt-3 text-sm font-medium">{adviceMessage}</p>
-                    )}
-                    {hasIncreasedAmount && (
-                        <p className="mt-2 text-2xl font-bold text-amber-700 tabular-nums dark:text-amber-300">
-                            +¥{increasedAmount.toLocaleString('ja-JP')}
-                        </p>
-                    )}
-                    {savingSuggestion && (
-                        <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                            {savingSuggestion}
-                        </p>
-                    )}
-                </Card>
+                    <p className="mt-3 text-sm leading-relaxed">{monthLabel}の「{comparison.category}」の記録額は、{comparison.previousMonth}より¥{Number(comparison.difference).toLocaleString('ja-JP')}多くなっています。</p>
+                    <p className="mt-2 text-xs tabular-nums">前月 ¥{Number(comparison.previousAmount).toLocaleString('ja-JP')} → 対象月 ¥{Number(comparison.currentAmount).toLocaleString('ja-JP')}</p>
+                    <p className="mt-3 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">両月に記録された分だけの比較です。記録漏れや件数の違いも影響するため、節約の成果や満足度を示すものではありません。</p>
+                </Card>}
             </div>
         </AuthenticatedLayout>
     );
