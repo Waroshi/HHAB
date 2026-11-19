@@ -32,7 +32,7 @@ Route::post('/expenses', [
 Route::get('/transaction', [TransactionController::class, 'index'])->name('transactions.index');
 
 Route::get('/readings', function () {
-    return Inertia::render('Readings');
+    return Inertia::render('Scan');
 })->name('readings.index');
 
 Route::get('/calendar', [
